@@ -4,6 +4,8 @@
     <title>CCTV 영상</title>
 </head>
 <body>
+    <img id="inputImage" src="/static/C000002_003_0009_C_D_F_0.jpg" width="640" height="640">
+    <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
     <div id="cctvContainer"></div>
     <!-- Import TensorFlow.js library -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
@@ -25,16 +27,69 @@
                 iframe.setAttribute("allowfullscreen", "");
                 cctvContainer.appendChild(iframe);
 
-                // using reference to iframe obtained
-                var win = iframe.contentWindow; // reference to iframe's window
-                // reference to document in iframe
-                var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
-                // reference to form named 'demoForm' in iframe
-                var form = doc.getElementById('vid_html5_api');
+                // // using reference to iframe obtained
+                // var win = iframe.contentWindow; // reference to iframe's window
+                // // reference to document in iframe
+                // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
+                // // reference to form with below id in iframe
+                // var form = doc.getElementById('vid_html5_api');
 
-                // Now you can use the yolov5 model for predictions
-                // yolov5.predict(iframe);
-                // yolov5.predict('http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616')
+                // Wait for the iframe's content to load
+                iframe.onload = async function() {
+                    try {
+                        // // Get the video element within the iframe
+                        
+                        // // using reference to iframe obtained
+                        // var win = iframe.contentWindow; // reference to iframe's window
+                        // // reference to document in iframe
+                        // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
+                        // // reference to form with below id in iframe
+                        // var form = doc.getElementById('vid_html5_api');
+
+                        // // Convert the video frame to a tf.Tensor
+                        // const input = tf.tidy(() => {
+                        //     const img = tf.browser.fromPixels(form);
+                        //     return img.expandDims(0);
+                        // });
+
+                        // // Make predictions using the yolov5 model
+                        // const predictions = await yolov5.predict(input);
+
+                        // // Handle the predictions as needed
+                        // // ...
+
+                    } catch (error) {
+                        console.error("Error:", error);
+                    }
+                };
+
+                // Convert the video frame to a tf.Tensor
+                const input = tf.tidy(() => {
+                    const img = tf.browser.fromPixels(document.getElementById("inputImage"));
+                    return img.expandDims(0);
+                });
+                const inputfloat32 = tf.cast(input, 'float32')
+                console.log(inputfloat32)
+
+                // Make predictions using the yolov5 model
+                const predictions = await yolov5.executeAsync(inputfloat32);
+                console.log(predictions)
+
+                // predict 입력값 확인
+                var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+                var ARGUMENT_NAMES = /([^\s,]+)/g;
+                function getParamNames(func) {
+                var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+                var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+                if(result === null)
+                    result = [];
+                return result;
+                }
+                // console.log(getParamNames(yolov5.predict))
+                // console.log(getParamNames(yolov5))
+                console.log(getParamNames(predictions))
+                // console.log(getParamNames(yolov5.predict))
+                // console.log(getParamNames(yolov5.predict))
             } catch (error) {
                 console.error("Error:", error);
             }
