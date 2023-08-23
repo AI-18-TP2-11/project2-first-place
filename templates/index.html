@@ -27,6 +27,8 @@
                 iframe.setAttribute("allowfullscreen", "");
                 cctvContainer.appendChild(iframe);
 
+                const inputImage = document.getElementById("inputImage")
+
                 // // using reference to iframe obtained
                 // var win = iframe.contentWindow; // reference to iframe's window
                 // // reference to document in iframe
@@ -65,15 +67,40 @@
 
                 // Convert the video frame to a tf.Tensor
                 const input = tf.tidy(() => {
-                    const img = tf.browser.fromPixels(document.getElementById("inputImage"));
+                    const img = tf.browser.fromPixels(inputImage).div(255.0);
                     return img.expandDims(0);
                 });
-                const inputfloat32 = tf.cast(input, 'float32')
-                console.log(inputfloat32)
+                // const inputfloat32 = tf.cast(input, 'float32')
+                // console.log(inputfloat32)
+                console.log(input)
 
                 // Make predictions using the yolov5 model
-                const predictions = await yolov5.executeAsync(inputfloat32);
+                const predictions = await yolov5.executeAsync(input);
                 console.log(predictions)
+
+                // predictions.forEach(tensor => {
+                //     console.log(tensor.shape);
+                // });
+
+                const [boxes, scores, classes, valid_detections] = predictions;
+                const boxes_data = boxes.dataSync();
+                const scores_data = scores.dataSync();
+                const classes_data = classes.dataSync();
+                const valid_detections_data = valid_detections.dataSync()[0];
+
+                var i;
+                for (i = 0; i < valid_detections_data; ++i){
+                    let [x1, y1, x2, y2] = boxes_data.slice(i * 4, (i + 1) * 4);
+                    x1 *= inputImage.width;
+                    x2 *= inputImage.width;
+                    y1 *= inputImage.height;
+                    y2 *= inputImage.height;
+                    const width = x2 - x1;
+                    const height = y2 - y1;
+                    // const klass = names[classes_data[i]];
+                    const score = scores_data[i].toFixed(2);
+                    console.log(x1, x2, y1, y2)
+                }
 
                 // predict 입력값 확인
                 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
@@ -87,7 +114,7 @@
                 }
                 // console.log(getParamNames(yolov5.predict))
                 // console.log(getParamNames(yolov5))
-                console.log(getParamNames(predictions))
+                // console.log(getParamNames(predictions)) // https://github.com/zldrobit/tfjs-yolov5-example/blob/main/src/index.js
                 // console.log(getParamNames(yolov5.predict))
                 // console.log(getParamNames(yolov5.predict))
             } catch (error) {
