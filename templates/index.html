@@ -19,7 +19,7 @@
             '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
             '킥보드','킥보드 캐리어','킥보드 보행자도로 통행','킥보드 안전모 미착용','킥보드 무단 횡단','킥보드 신호 위반','킥보드 횡단보도 주행','킥보드 동승자 탑승'];
         // yolov5 모델에서 결과 반환하는 함수
-
+        let yolov5 = null;
         async function loadModel() {
             try {
                 const yolov5 = await tf.loadGraphModel('/static/best_web_model/model.json');
@@ -32,9 +32,13 @@
                 return null;
             }
         }
+        // 모델 로드되면 yolov5에 저장
+        loadModel().then(model => {
+            yolov5 = model;
+            setInterval(predict, 500);
+        })
 
         async function predict() {
-            const yolov5 = await loadModel();
             // Convert the video frame to a tf.Tensor
             const inputImage = document.getElementById("inputImage");
             const input = tf.tidy(() => {
@@ -245,7 +249,6 @@
             }
         }
 
-        predict();
     </script>
 </body>
 </html>
