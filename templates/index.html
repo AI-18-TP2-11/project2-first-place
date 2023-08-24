@@ -22,6 +22,8 @@
             ['오토바이','오토바이 보행자도로 통행','오토바이 안전모 미착용','오토바이 무단횡단','오토바이 신호 위반','오토바이 정지선 위반','오토바이 횡단보도 주행',
             '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
             '킥보드','킥보드 캐리어','킥보드 보행자도로 통행','킥보드 안전모 미착용','킥보드 무단 횡단','킥보드 신호 위반','킥보드 횡단보도 주행','킥보드 동승자 탑승'];
+        // 학습 데이터 이미지 비율. 이것으로 예측 데이터 이미지 비율 조정 필요
+        const aspectRatio = 16/9
         // yolov5 모델에서 결과 반환하는 함수
         let yolov5 = null;
         async function loadModel() {
@@ -47,20 +49,30 @@
             const inputImage = document.getElementById("inputImage");
             const input = tf.browser.fromPixels(inputImage).div(255.0);
             let rescaledInput;
-            
-            // reshape
+
             const [iHeight, iWidth] = input.shape
+            // 사이즈 조정 단계
+            // 1. 16:9 비율로 현 이미지 세로 늘려줌
+            // 2. padding으로 정사각형으로 만듦
+            // 3. 640x640로 resize
+
+            // 1. 비율 늘려주기
+            const iHeightIntermediate = Math.round(iHeight * aspectRatio);
+            console.log(iHeightIntermediate);
+            rescaledInput = tf.image.resizeBilinear(input, [iHeightIntermediate, iWidth], true);
+            console.log(rescaledInput.shape);
+            // 2. padding
             let padAmount;
-            if (iHeight > iWidth) {
-                padAmount = iHeight - iWidth
+            if (iHeightIntermediate > iWidth) { // 중간 iHeight으로 이미지 padding 결정
+                padAmount = iHeightIntermediate - iWidth
                 rescaledInput = input.pad([
                     [0,0],
                     [0, padAmount],
                     [0,0]
                 ]);
             }
-            else if (iHeight < iWidth) {
-                padAmount = iWidth - iHeight
+            else if (iHeightIntermediate < iWidth) {
+                padAmount = iWidth - iHeightIntermediate
                 rescaledInput = input.pad([
                     [0, padAmount],
                     [0,0],
@@ -70,11 +82,10 @@
             else {
                 rescaledInput = input
             }
-
+            // 3. resize
             rescaledInput = tf.image.resizeBilinear(rescaledInput, [640,640], true).expandDims(0);
 
             // Make predictions using the yolov5 model
-            // const predictions = await yolov5.executeAsync(rescaledInput);
             const predictions = await yolov5.executeAsync(rescaledInput);
 
             // predictions.forEach(tensor => {
@@ -95,8 +106,8 @@
                 let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
                 x1 *= inputImage.width;
                 x2 *= inputImage.width;
-                y1 *= inputImage.height;
-                y2 *= inputImage.height;
+                y1 *= inputImage.height; // iHeightIntermediate으로 계산 안 함
+                y2 *= inputImage.height; // iHeightIntermediate으로 계산 안 함
                 let width = x2 - x1;
                 let height = y2 - y1;
                 reshaped_bboxes.push([x1, y1, width, height]);
