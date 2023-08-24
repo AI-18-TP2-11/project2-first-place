@@ -19,139 +19,196 @@
             '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
             '킥보드','킥보드 캐리어','킥보드 보행자도로 통행','킥보드 안전모 미착용','킥보드 무단 횡단','킥보드 신호 위반','킥보드 횡단보도 주행','킥보드 동승자 탑승'];
         // yolov5 모델에서 결과 반환하는 함수
-        async function loadModelAndPredict() {
+
+        async function loadModel() {
             try {
                 const yolov5 = await tf.loadGraphModel('/static/best_web_model/model.json');
                 // Other code related to loading and setting up the model
+                // ...
 
-                // URL
-                const api_url = 'http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616'
-
-                // CCTV 영상 추가
-                const cctvContainer = document.getElementById("cctvContainer");
-                const iframe = document.createElement("iframe");
-                iframe.src = api_url;
-                iframe.width = "1000";
-                iframe.height = "1000";
-                iframe.setAttribute("allowfullscreen", "");
-                cctvContainer.appendChild(iframe);
-
-                const inputImage = document.getElementById("inputImage")
-
-                // // using reference to iframe obtained
-                // var win = iframe.contentWindow; // reference to iframe's window
-                // // reference to document in iframe
-                // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
-                // // reference to form with below id in iframe
-                // var form = doc.getElementById('vid_html5_api');
-
-                // Wait for the iframe's content to load
-                iframe.onload = async function() {
-                    try {
-                        // // Get the video element within the iframe
-                        
-                        // // using reference to iframe obtained
-                        // var win = iframe.contentWindow; // reference to iframe's window
-                        // // reference to document in iframe
-                        // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
-                        // // reference to form with below id in iframe
-                        // var form = doc.getElementById('vid_html5_api');
-
-                        // // Convert the video frame to a tf.Tensor
-                        // const input = tf.tidy(() => {
-                        //     const img = tf.browser.fromPixels(form);
-                        //     return img.expandDims(0);
-                        // });
-
-                        // // Make predictions using the yolov5 model
-                        // const predictions = await yolov5.predict(input);
-
-                        // // Handle the predictions as needed
-                        // // ...
-
-                    } catch (error) {
-                        console.error("Error:", error);
-                    }
-                };
-
-                // Convert the video frame to a tf.Tensor
-                const input = tf.tidy(() => {
-                    const img = tf.browser.fromPixels(inputImage).div(255.0);
-                    return img.expandDims(0);
-                });
-                // const inputfloat32 = tf.cast(input, 'float32')
-                // console.log(inputfloat32)
-                console.log(input)
-
-                // Make predictions using the yolov5 model
-                const predictions = await yolov5.executeAsync(input);
-                console.log(predictions)
-
-                // predictions.forEach(tensor => {
-                //     console.log(tensor.shape);
-                // });
-
-                const [bboxes, scores, labels, valid_detections] = predictions;
-                const bboxes_data = bboxes.dataSync(); // 1차원 array
-                const scores_data = scores.dataSync();
-                const labels_data = labels.dataSync();
-                const valid_detections_data = valid_detections.dataSync()[0];
-
-                // console.log(bboxes_data.slice(0,5))
-
-                // 1차원 배열을 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
-                const reshaped_bboxes = [];
-                for (let i = 0; i < valid_detections_data; i += 1) {
-                    let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
-                    x1 *= inputImage.width;
-                    x2 *= inputImage.width;
-                    y1 *= inputImage.height;
-                    y2 *= inputImage.height;
-                    let width = x2 - x1;
-                    let height = y2 - y1;
-                    reshaped_bboxes.push([x1, y1, width, height]);
-                }
-
-                // 그리기
-                drawBb(reshaped_bboxes, scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
-                // drawBb(bboxes_data.sclie(0,valid_detections_data), scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
-
-                // debugging
-                var i;
-                for (i = 0; i < valid_detections_data; ++i){
-                    let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
-                    x1 *= inputImage.width;
-                    x2 *= inputImage.width;
-                    y1 *= inputImage.height;
-                    y2 *= inputImage.height;
-                    const width = x2 - x1;
-                    const height = y2 - y1;
-                    const label = names[labels_data[i]];
-                    const score = scores_data[i].toFixed(2);
-                    console.log(x1, x2, y1, y2)
-                    console.log(score)
-                    console.log(label)
-                }
-
-                // predict 입력값 확인
-                var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-                var ARGUMENT_NAMES = /([^\s,]+)/g;
-                function getParamNames(func) {
-                var fnStr = func.toString().replace(STRIP_COMMENTS, '');
-                var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-                if(result === null)
-                    result = [];
-                return result;
-                }
-                // console.log(getParamNames(yolov5.predict))
-                // console.log(getParamNames(yolov5))
-                // console.log(getParamNames(predictions)) // https://github.com/zldrobit/tfjs-yolov5-example/blob/main/src/index.js
-                // console.log(getParamNames(yolov5.predict))
-                // console.log(getParamNames(yolov5.predict))
+                return yolov5;
             } catch (error) {
                 console.error("Error:", error);
+                return null;
             }
         }
+
+        async function predict() {
+            const yolov5 = await loadModel();
+            // Convert the video frame to a tf.Tensor
+            const inputImage = document.getElementById("inputImage");
+            const input = tf.tidy(() => {
+                const img = tf.browser.fromPixels(inputImage).div(255.0);
+                return img.expandDims(0);
+            });
+
+            // Make predictions using the yolov5 model
+            const predictions = await yolov5.executeAsync(input);
+            console.log(predictions)
+
+            // predictions.forEach(tensor => {
+            //     console.log(tensor.shape);
+            // });
+
+            const [bboxes, scores, labels, valid_detections] = predictions;
+            const bboxes_data = bboxes.dataSync(); // 1차원 array
+            const scores_data = scores.dataSync();
+            const labels_data = labels.dataSync();
+            const valid_detections_data = valid_detections.dataSync()[0];
+
+            // console.log(bboxes_data.slice(0,5))
+
+            // 1차원 배열을 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
+            const reshaped_bboxes = [];
+            for (let i = 0; i < valid_detections_data; i += 1) {
+                let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
+                x1 *= inputImage.width;
+                x2 *= inputImage.width;
+                y1 *= inputImage.height;
+                y2 *= inputImage.height;
+                let width = x2 - x1;
+                let height = y2 - y1;
+                reshaped_bboxes.push([x1, y1, width, height]);
+            }
+
+            // 그리기
+            drawBb(reshaped_bboxes, scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
+        
+        }
+        
+        // async function loadModelAndPredict() {
+        //     try {
+        //         const yolov5 = await tf.loadGraphModel('/static/best_web_model/model.json');
+        //         // Other code related to loading and setting up the model
+
+        //         // URL
+        //         const api_url = 'http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616'
+
+        //         // CCTV 영상 추가
+        //         const cctvContainer = document.getElementById("cctvContainer");
+        //         const iframe = document.createElement("iframe");
+        //         iframe.src = api_url;
+        //         iframe.width = "1000";
+        //         iframe.height = "1000";
+        //         iframe.setAttribute("allowfullscreen", "");
+        //         cctvContainer.appendChild(iframe);
+
+        //         const inputImage = document.getElementById("inputImage")
+
+        //         // // using reference to iframe obtained
+        //         // var win = iframe.contentWindow; // reference to iframe's window
+        //         // // reference to document in iframe
+        //         // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
+        //         // // reference to form with below id in iframe
+        //         // var form = doc.getElementById('vid_html5_api');
+
+        //         // Wait for the iframe's content to load
+        //         iframe.onload = async function() {
+        //             try {
+        //                 // // Get the video element within the iframe
+                        
+        //                 // // using reference to iframe obtained
+        //                 // var win = iframe.contentWindow; // reference to iframe's window
+        //                 // // reference to document in iframe
+        //                 // var doc = iframe.contentDocument? iframe.contentDocument: iframe.contentWindow.document;
+        //                 // // reference to form with below id in iframe
+        //                 // var form = doc.getElementById('vid_html5_api');
+
+        //                 // // Convert the video frame to a tf.Tensor
+        //                 // const input = tf.tidy(() => {
+        //                 //     const img = tf.browser.fromPixels(form);
+        //                 //     return img.expandDims(0);
+        //                 // });
+
+        //                 // // Make predictions using the yolov5 model
+        //                 // const predictions = await yolov5.predict(input);
+
+        //                 // // Handle the predictions as needed
+        //                 // // ...
+
+        //             } catch (error) {
+        //                 console.error("Error:", error);
+        //             }
+        //         };
+
+        //         // Convert the video frame to a tf.Tensor
+        //         const input = tf.tidy(() => {
+        //             const img = tf.browser.fromPixels(inputImage).div(255.0);
+        //             return img.expandDims(0);
+        //         });
+        //         // const inputfloat32 = tf.cast(input, 'float32')
+        //         // console.log(inputfloat32)
+        //         console.log(input)
+
+        //         // Make predictions using the yolov5 model
+        //         const predictions = await yolov5.executeAsync(input);
+        //         console.log(predictions)
+
+        //         // predictions.forEach(tensor => {
+        //         //     console.log(tensor.shape);
+        //         // });
+
+        //         const [bboxes, scores, labels, valid_detections] = predictions;
+        //         const bboxes_data = bboxes.dataSync(); // 1차원 array
+        //         const scores_data = scores.dataSync();
+        //         const labels_data = labels.dataSync();
+        //         const valid_detections_data = valid_detections.dataSync()[0];
+
+        //         // console.log(bboxes_data.slice(0,5))
+
+        //         // 1차원 배열을 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
+        //         const reshaped_bboxes = [];
+        //         for (let i = 0; i < valid_detections_data; i += 1) {
+        //             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
+        //             x1 *= inputImage.width;
+        //             x2 *= inputImage.width;
+        //             y1 *= inputImage.height;
+        //             y2 *= inputImage.height;
+        //             let width = x2 - x1;
+        //             let height = y2 - y1;
+        //             reshaped_bboxes.push([x1, y1, width, height]);
+        //         }
+
+        //         // 그리기
+        //         drawBb(reshaped_bboxes, scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
+        //         // drawBb(bboxes_data.sclie(0,valid_detections_data), scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
+
+        //         // debugging
+        //         var i;
+        //         for (i = 0; i < valid_detections_data; ++i){
+        //             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
+        //             x1 *= inputImage.width;
+        //             x2 *= inputImage.width;
+        //             y1 *= inputImage.height;
+        //             y2 *= inputImage.height;
+        //             const width = x2 - x1;
+        //             const height = y2 - y1;
+        //             const label = names[labels_data[i]];
+        //             const score = scores_data[i].toFixed(2);
+        //             console.log(x1, x2, y1, y2)
+        //             console.log(score)
+        //             console.log(label)
+        //         }
+
+        //         // predict 입력값 확인
+        //         var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        //         var ARGUMENT_NAMES = /([^\s,]+)/g;
+        //         function getParamNames(func) {
+        //         var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+        //         var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+        //         if(result === null)
+        //             result = [];
+        //         return result;
+        //         }
+        //         // console.log(getParamNames(yolov5.predict))
+        //         // console.log(getParamNames(yolov5))
+        //         // console.log(getParamNames(predictions)) // https://github.com/zldrobit/tfjs-yolov5-example/blob/main/src/index.js
+        //         // console.log(getParamNames(yolov5.predict))
+        //         // console.log(getParamNames(yolov5.predict))
+        //     } catch (error) {
+        //         console.error("Error:", error);
+        //     }
+        // }
 
         // 입력한 frame마다 pm 담아두는 변수
         var pms = [];
@@ -188,7 +245,7 @@
             }
         }
 
-        loadModelAndPredict();
+        predict();
     </script>
 </body>
 </html>
