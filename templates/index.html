@@ -6,10 +6,14 @@
 </head>
 <body>
     <div id="view" class="view">
-        <img id="inputImage" src="/static/C000002_003_0009_C_D_F_0.jpg" width="640" height="640">
+        <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/wVVlhfh724Q?si=vN_iTDZvmB3_BZWa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+        <img id="inputImage" src="/static/C000002_003_0009_C_D_F_0.jpg" width="640">
+        <!-- <img id="inputImage" src="/static/C000002_003_0009_C_D_F_0.jpg" width="640" height="600"> -->
     </div>
     <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
-    <div id="cctvContainer"></div>
+    <div id="cctvContainer">
+        <iframe src="http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616" width="1000" height="1000" allowfullscreen></iframe>
+    </div>
     <!-- Import TensorFlow.js library -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
     <script>
@@ -35,20 +39,43 @@
         // 모델 로드되면 yolov5에 저장
         loadModel().then(model => {
             yolov5 = model;
-            setInterval(predict, 500);
+            setInterval(predict, 1000);
         })
 
         async function predict() {
             // Convert the video frame to a tf.Tensor
             const inputImage = document.getElementById("inputImage");
-            const input = tf.tidy(() => {
-                const img = tf.browser.fromPixels(inputImage).div(255.0);
-                return img.expandDims(0);
-            });
+            const input = tf.browser.fromPixels(inputImage).div(255.0);
+            let rescaledInput;
+            
+            // reshape
+            const [iHeight, iWidth] = input.shape
+            let padAmount;
+            if (iHeight > iWidth) {
+                padAmount = iHeight - iWidth
+                rescaledInput = input.pad([
+                    [0,0],
+                    [0, padAmount],
+                    [0,0]
+                ]);
+            }
+            else if (iHeight < iWidth) {
+                padAmount = iWidth - iHeight
+                rescaledInput = input.pad([
+                    [0, padAmount],
+                    [0,0],
+                    [0,0]
+                ]);
+            }
+            else {
+                rescaledInput = input
+            }
+
+            rescaledInput = tf.image.resizeBilinear(rescaledInput, [640,640], true).expandDims(0);
 
             // Make predictions using the yolov5 model
-            const predictions = await yolov5.executeAsync(input);
-            console.log(predictions)
+            // const predictions = await yolov5.executeAsync(rescaledInput);
+            const predictions = await yolov5.executeAsync(rescaledInput);
 
             // predictions.forEach(tensor => {
             //     console.log(tensor.shape);
@@ -225,8 +252,9 @@
             // pms에서 지우기
             pms.splice(0);
 
+            // console.log(labels)
+            console.log(bboxes)
             // bbox마다
-            console.log(labels)
             for (let n=0; n < bboxes.length; n++) {
                 const label = document.createElement('p');
                 // label
