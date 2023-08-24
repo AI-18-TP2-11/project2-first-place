@@ -4,24 +4,24 @@ https://ffmpeg.org/download.html#build-windows에서 프로그램 설치 및 환
 bash : ffmpeg -version을 통해 설치 확인 가능
  '''
 # ffmpeg-python 라이브러리 설치
-!pip install ffmpeg-python
+# !pip install ffmpeg-python
 import subprocess
 import time
 import datetime
 
 # 파일명에 날짜정보 추가를 위한 변수 설정
 current_datetime = datetime.datetime.now()
-year = current_datetime.date().year
-month = current_datetime.date().month
-day = current_datetime.date().day
-hour = current_datetime.hour
-minute = current_datetime.minute
-second = current_datetime.second
+year = current_datetime.strftime("%Y")
+month = current_datetime.strftime("%m")
+day = current_datetime.strftime("%d")
+hour = current_datetime.strftime("%H")
+minute = current_datetime.strftime("%M")
+second = current_datetime.strftime("%S")
 
 # 지역 이름 설정 / ex. 역삼역
-region_name = '역삼역'
+region_name = '전주_병무청오거리'
 # 실시간 영상 데이터(.m3u8) url 입력
-stream_url = "http://210.179.218.54:1935/live/338.stream/playlist.m3u8"
+stream_url = "http://115.92.162.198:1935/live/CCTV_21.stream/playlist.m3u8"
 
 # 저장할 동영상 파일명 설정 / ex. 역삼역_20230824_172230.mp4
 output_filename = f"{region_name}_{year}{month}{day}_{hour}{minute}{second}.mp4"
