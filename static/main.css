@@ -1,0 +1,36 @@
+
+
+
+    .bar1 {
+        float: left;
+        width:100%;
+        height:120px;
+        background-color:#999;
+        font-size: 60px;
+        text-align: center;
+        color:#FFFFFF;
+        line-height: 200%;
+        }
+    
+    .bar2 {
+        float: left;
+        width:100%;
+        height:100px;
+        background-color:#dddddd;}
+    
+    .input-box-main{
+        width: 960px;
+        height:30px;
+        background-color: #FFFFFF;
+        padding:15px;
+        border: 5px solid #6E6E6E;
+        border-radius: 10px;
+        box-sizing: content-box;
+        margin: 10px auto;
+        font-size: 1.2em;
+        text-align: center;
+        color: #6E6E6E;
+        margin: 10px auto;
+        background-repeat: no-repeat;
+        background-position: left center, right center;
+        }
