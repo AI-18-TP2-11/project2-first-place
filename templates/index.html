@@ -41,10 +41,11 @@
         // 모델 로드되면 yolov5에 저장
         loadModel().then(model => {
             yolov5 = model;
-            setInterval(predict, 1000);
+            setInterval(predict, 200);
         })
 
         async function predict() {
+            tf.engine().startScope();
             // Convert the video frame to a tf.Tensor
             const inputImage = document.getElementById("inputImage");
             const input = tf.browser.fromPixels(inputImage).div(255.0);
@@ -58,7 +59,7 @@
 
             // 1. 비율 늘려주기
             const iHeightIntermediate = Math.round(iHeight * aspectRatio);
-            console.log(iHeightIntermediate);
+            // console.log(iHeightIntermediate);
             rescaledInput = tf.image.resizeBilinear(input, [iHeightIntermediate, iWidth], true);
             console.log(rescaledInput.shape);
             // 2. padding
@@ -93,10 +94,13 @@
             // });
 
             const [bboxes, scores, labels, valid_detections] = predictions;
-            const bboxes_data = bboxes.dataSync(); // 1차원 array
-            const scores_data = scores.dataSync();
-            const labels_data = labels.dataSync();
+            // drawBb에는 tensor 전달 안 하기
+            const bboxes_data = Array.from(bboxes.dataSync()); // 1차원 array
+            const scores_data = Array.from(scores.dataSync());
+            const labels_data = Array.from(labels.dataSync());
             const valid_detections_data = valid_detections.dataSync()[0];
+
+            // console.log(bboxes)
 
             // console.log(bboxes_data.slice(0,5))
 
@@ -115,7 +119,7 @@
 
             // 그리기
             drawBb(reshaped_bboxes, scores_data.slice(0,valid_detections_data), labels_data.slice(0,valid_detections_data));
-        
+            tf.engine().endScope();
         }
         
         // async function loadModelAndPredict() {
@@ -256,6 +260,7 @@
         var pms = [];
 
         function drawBb(bboxes, scores, labels) {
+            // tf.engine().startScope();
             // html에서 지우기
             for (let i=0; i < pms.length; i++) {
                 view.removeChild(pms[i])
@@ -286,6 +291,7 @@
                 pms.push(drawing);
                 // pms.push(label);
             }
+            // tf.engine().endScope();
         }
 
     </script>
