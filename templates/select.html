@@ -1,20 +1,76 @@
 <!DOCTYPE html>
 <html>
   <link href="{{ url_for('static', filename='select.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
   <head>
     <title>select CCTV page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b1a6a35057639effceea599b9e6493cd"></script>
   </head>
 
   <body>
-    <!--
-    <input type="button" value="click" onclick="showConfirm();">
+    
+    <div class='bar1'>
+      교통 위반 탐지 서비스
+    </div>
 
-     <script language="javascript">
-        function showConfirm() {
-        if (confirm("CCTV 정보, 현재 구간을 조회하시겠습니까?"))
-        }
-     </script>
-     -->
+    <div class='map' id="map" style="width:1500px;height:1000px;"></div>
+    <script>
+      var mapContainer = document.getElementById('map');
+      var mapOption = {
+          center: new kakao.maps.LatLng(37.5642135, 127.0016985),
+          level: 4
+      };
+      
+      var map = new kakao.maps.Map(mapContainer, mapOption);
+      
+      var imageSrc = './static/images/pin.png',
+          imageSize = new kakao.maps.Size(32, 32),
+          imageOption = {offset: new kakao.maps.Point(27, 69)};
+      
+      var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+      var csvData = {{ csv_data | tojson | safe }};
+
+      var currentInfowindow = null;
+
+      csvData.forEach(function(row) {
+          var xCoord = parseFloat(row.XCOORD);
+          var yCoord = parseFloat(row.YCOORD);
+          var cctvName = row.CCTVNAME;
+          var centerName = row.CENTERNAME;
+
+          var markerPosition = new kakao.maps.LatLng(yCoord, xCoord);
+          var marker = new kakao.maps.Marker({
+              position: markerPosition,
+              image: markerImage
+          });
+
+          var content = '<div><strong>' + cctvName + '</strong><br>' + centerName +
+                        '<br><button onclick="showMessageBox()">CCTV 조회</button></div>';
+          var infowindow = new kakao.maps.InfoWindow({
+              content: content
+          });
+
+          kakao.maps.event.addListener(marker, 'click', function() {
+              if (currentInfowindow) {
+                  currentInfowindow.close();
+              }
+              infowindow.open(map, marker);
+              currentInfowindow = infowindow;
+          });
+
+          marker.setMap(map);
+      });
+
+      function showMessageBox() {
+          var confirmation = confirm("현재 CCTV를 조회하시겠습니까?");
+          if (confirmation) {
+              var detectUrl = window.location.origin + '/detect';
+              window.location.href = detectUrl;
+          }
+      }
+    </script>
 
   </body>
 </html>
