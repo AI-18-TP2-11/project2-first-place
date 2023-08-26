@@ -1,0 +1,7 @@
+
+카카오 지도 API 생성
+https://apis.map.kakao.com/web/guide/
+
+마커 생성
+https://apis.map.kakao.com/web/sample/basicMarkerImage/
+

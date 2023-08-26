@@ -21,10 +21,20 @@
     </div>
     <!-- </form> -->
     
+    <div class='map' id="map" style="width:1500px;height:1000px;"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b1a6a35057639effceea599b9e6493cd"></script>
+    <script>
+      var container = document.getElementById('map');
+      var options = {
+        center: new kakao.maps.LatLng(37.5642135, 127.0016985),
+        level: 10
+      };
+  
+      var map = new kakao.maps.Map(container, options);
+    </script>
+        
     
-    <div class='map'>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202405.6536652797!2d126.80932536793293!3d37.564761545619675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca2012d5c39cf%3A0x7e11eca1405bf29b!2z7ISc7Jq47Yq567OE7Iuc!5e0!3m2!1sko!2skr!4v1692887856178!5m2!1sko!2skr" width="1300" height="600" style="border:3;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
+      </div>
 
   </body>
 
