@@ -12,18 +12,35 @@
         <div class='bar'>실시간 탐지 상황</div>
         <div id="cctvContainer"></div>
         <script>
-            // URL
-            const api_url = 'http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616'
-            // `http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L010326&cctvname=%25ED%2595%259C%25EC%2596%2591%25EB%258C%2580&kind=Seoul&cctvip=null&cctvch=52&id=180&cctvpasswd=null&cctvport=null&minX=127.01967013959295&minY=37.545434417247826&maxX=127.0518149423723&maxY=37.57074466573169`;
-    
-            // CCTV 영상 추가
+
+          function addCCTVStream(url) {
             const cctvContainer = document.getElementById("cctvContainer");
             const iframe = document.createElement("iframe");
-            iframe.src = api_url;
-            iframe.width = "600";
+            iframe.src = url;
+            iframe.width = "550";
             iframe.height = "400";
             iframe.setAttribute("allowfullscreen", "");
-            cctvContainer.appendChild(iframe);
+            cctvContainer.appendChild(iframe); }
+
+            // 현재 페이지 URL을 가져옵니다.
+            var currentUrl = window.location.href;
+
+            // URL의 쿼리 문자열을 가져옵니다.
+            var queryString = currentUrl.split('?')[1];
+
+            // 쿼리 문자열을 파싱하여 객체로 만듭니다.
+            var queryParams = {};
+            queryString.split('&').forEach(function (param) {
+                var parts = param.split('=');
+                var key = decodeURIComponent(parts[0]);
+                var value = decodeURIComponent(parts[1]);
+                queryParams[key] = value;
+            });
+
+            // url 파라미터를 가져옵니다.
+            var urlParam = queryParams['url'];
+
+            addCCTVStream(urlParam);
         </script>
 
     </div>
