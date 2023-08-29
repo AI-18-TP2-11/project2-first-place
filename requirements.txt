@@ -1,2 +1,5 @@
+flask==2.3.3
 opencv-python==4.8.0.76
+requests==2.31.0
+selenium==4.11.2
 tensorflow==2.13.*

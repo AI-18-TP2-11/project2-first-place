@@ -20,7 +20,7 @@ def detect():
 
 def parse_csv():
     data = []
-    with open('/Users/yerin/AIB/project/TP2/project2-first-place/static/CCTV.csv', 'r', encoding='utf-8') as csvfile:
+    with open('static/CCTV.csv', 'r', encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
             data.append(row)
