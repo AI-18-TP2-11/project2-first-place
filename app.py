@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, send_file
 import os
 import csv
-from get_video_url import get_video_url
+from get_video_src import get_video_src
 
 app = Flask(__name__)
 
@@ -16,8 +16,8 @@ def main():
 @app.route('/detect')
 def detect():
     cctv_url = request.args.get('url')
-    print(get_video_url(cctv_url))
-    return render_template('detect.html', cctv_url=cctv_url)
+    video_src = get_video_src(cctv_url)
+    return render_template('detect.html', video_src=video_src)
 
 def parse_csv():
     data = []
