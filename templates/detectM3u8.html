@@ -20,14 +20,12 @@
         <div class='bar'>실시간 탐지 상황</div>
         <div id="cctvContainer">
           <video id="inputVideo" data-setup="{}" class="video-js" controls width="640" height="360" autoplay muted crossorigin="anonymous">
-            <source src="{{ video_src }}" type="application/x-mpegURL">
+            <source src="{{ video_src }}">
           </video>
-          <!-- <video id="inputVideo" controls width="550" height="400" autoplay muted crossorigin="anonymous">
-            <source  src="{{ video_src }}">
-          </video> -->
         </div>
         <script>
 
+          
           // function addCCTVStream(url) {
           //   const cctvContainer = document.getElementById("cctvContainer");
           //   const iframe = document.createElement("iframe");

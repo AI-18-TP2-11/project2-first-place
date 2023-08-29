@@ -16,8 +16,14 @@ def main():
 @app.route('/detect')
 def detect():
     cctv_url = request.args.get('url')
-    video_src = get_video_src(cctv_url)
-    return render_template('detect.html', video_src=video_src)
+    video_src: str = get_video_src(cctv_url)
+    print(video_src)
+    if video_src.endswith('m3u8'):
+        template = 'detectM3u8.html'
+    else:
+        template = 'detectMp4.html'
+    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ0zCTyXyVrPyfgh5MpAkrKKLMeIo6N0x1o5xQp5caGPNX'
+    return render_template(template, video_src=video_src)
 
 def parse_csv():
     data = []
