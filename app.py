@@ -15,14 +15,15 @@ def main():
 
 @app.route('/detect')
 def detect():
-    cctv_url = request.args.get('url')
-    video_src: str = get_video_src(cctv_url)
-    print(video_src)
-    if video_src.endswith('m3u8'):
-        template = 'detectM3u8.html'
-    else:
-        template = 'detectMp4.html'
-    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ0zCTyXyVrPyfgh5MpAkrKKLMeIo6N0x1o5xQp5caGPNX'
+    # cctv_url = request.args.get('url')
+    # video_src: str = get_video_src(cctv_url)
+    # print(video_src)
+    template = 'detectMp4.html'
+    # if video_src.endswith('m3u8'):
+    #     template = 'detectM3u8.html'
+    # else:
+    #     template = 'detectMp4.html'
+    video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ0zCTyXyVrPyfgh5MpAkrKKLMeIo6N0x1o5xQp5caGPNX'
     return render_template(template, video_src=video_src)
 
 def parse_csv():
@@ -37,6 +38,23 @@ def parse_csv():
 def select():
     csv_data = parse_csv()
     return render_template('select.html', csv_data=csv_data)
+
+@app.route('/test', methods=['POST'])
+def test_post():
+    '''
+    javascript에서 로그 받아오기\n
+    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', 'img_directory']
+    '''
+    data = request.json
+    bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
+    scores = data['scores'] # [0.6, 0.89,...]
+    labels = data['labels'] # [0, 4,...] # yolo 라벨 0-23
+    timestamp = data['timestamp'] # unix
+    width = data['width'] # 이미지 width
+    height = data['height'] # 이미지 height
+    img_directory = data['img_directory'] # 이미지 저장 경로
+    print(data.values())
+    return '보내기 성공', 200
 
 if __name__ == '__main__':
     app.run(debug=True)

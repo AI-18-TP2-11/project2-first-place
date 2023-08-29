@@ -17,7 +17,58 @@
     text-align: center;
     padding: 15px;
   }
+  img {
+    display: block;
+  }
 
+  .left p {
+      position: absolute;
+      margin: 0;
+      /* display: inline; */
+      /* padding: 0, 0, 0, 0; */
+      align-self: flex-end;
+      background-color: rgba(255, 111, 0, 0.25);
+      color: #FFF;
+      border: 1px dashed rgba(255, 255, 255, 0.7);
+      z-index: 2;
+      font-size: 12px;
+      text-align: center;
+  }
+
+  .test {
+      position: relative;
+      float: left;
+      width: 640;
+      margin: 10px;
+      cursor: pointer;
+  }
+
+  .test p {
+      position: absolute;
+      margin: 0;
+      /* display: inline; */
+      /* padding: 0, 0, 0, 0; */
+      align-self: flex-end;
+      background-color: rgba(255, 111, 0, 0.25);
+      color: #FFF;
+      border: 1px dashed rgba(255, 255, 255, 0.7);
+      z-index: 2;
+      font-size: 15px;
+      text-align: center;
+  }
+
+  .drawing {
+      background: rgba(0, 255, 0, 0.25);
+      border: 1px dashed #fff;
+      z-index: 1;
+      position: absolute;
+  }
+
+  .labelDiv {
+      z-index: 1;
+      position: absolute;
+      display: flex;
+  }
   .bar {
     width:90%;
     height:30px;

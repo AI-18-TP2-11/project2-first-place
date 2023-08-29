@@ -10,13 +10,12 @@
     <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
 
-    <script src="/static/predict.js" type="module"></script>
+    <script src="/static/script/predict.js" type="module"></script>
   </head>
 
   <body>
-
-    
-    <div class='left'>
+    <a id="target" style="display: none"></a> <!--이미지 저장하기 위해 canvas 그리는 용도-->    
+    <div class='left' id="view">
         <div class='bar'>실시간 탐지 상황</div>
         <div id="cctvContainer">
           <video id="inputVideo" data-setup="{}" class="video-js" controls width="640" height="360" autoplay muted crossorigin="anonymous">
