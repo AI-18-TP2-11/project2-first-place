@@ -1,5 +1,4 @@
-from flask import Flask, render_template
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, request, send_file
 import os
 import csv
 import requests
@@ -16,6 +15,8 @@ def main():
 
 @app.route('/detect')
 def detect():
+    cctv_url = request.args.get('url')
+    print(cctv_url)
     return render_template('detect.html')
 
 def parse_csv():
