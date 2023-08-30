@@ -220,7 +220,6 @@ async function predict() {
             realCropTop + 'px; width: ' +
             realCropWidth + 'px; height: ' +
             realCropHeight + 'px;'
-        test
         saveImage(imageData, log_bboxes, scores, labels, logCropBox, currentTimestamp + '.jpg');
 
         // 로그 저장 bbox, score, label, timestamp, width, height, directory
@@ -231,9 +230,9 @@ async function predict() {
 }
 
 // 저장할 이미지 그리는 함수
-async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, divTag) {
-    const test = document.getElementById('test');
-    deletePms(lpms, divTag); // 저장용 canvas 관리
+async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, logCropBox) {
+    const div = document.getElementById('test');
+    deletePms(lpms, logCropBox); // 저장용 canvas 관리
     
     if (!canvasHolder) {
         const canvas = document.createElement("canvas");
@@ -257,11 +256,11 @@ async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, divTag
     ctx.putImageData(imageData, 0, 0);
 
     // div에 추가
-    divTag.appendChild(canvas);
-    test.appendChild(divTag);
+    div.appendChild(canvas);
+    div.appendChild(logCropBox);
 
     // bounding box 그리고 div에 추가해서 div return
-    return drawBoundingBoxes(bboxes, scores, labels, lpms, divTag);
+    return drawBoundingBoxes(bboxes, scores, labels, lpms, logCropBox);
 }
 
 // 이미지와 bounding box 정보를 받아 JPG 파일로 저장합니다.
