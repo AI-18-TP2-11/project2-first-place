@@ -36,7 +36,7 @@
   .drawBlock {
     display: inline-block;
     position: relative;
-    margin: 10px;
+    /* margin: 10px; */
     cursor: pointer;
   }
 
@@ -78,12 +78,14 @@
     position: absolute;
     /* background-color:lightgray; */
     border: 2px solid rgb(0, 140, 255);
+    box-sizing: border-box;
   }
 
   #selection {
     position: absolute;
     /* background-color: lightblue; */
     border: 2px solid rgb(0, 140, 255);
+    box-sizing: border-box;
   }
 
   .drawing {

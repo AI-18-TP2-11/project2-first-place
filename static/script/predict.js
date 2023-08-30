@@ -26,7 +26,7 @@ function setIframeSrc() {
 };
 
 // video, 모델 결과 표기하는 div
-const view = document.getElementById('view')
+// const view = document.getElementById('view')
 const names = 
     ['오토바이','오토바이 보행자도로 통행','오토바이 안전모 미착용','오토바이 무단횡단','오토바이 신호 위반','오토바이 정지선 위반','오토바이 횡단보도 주행',
     '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
@@ -86,41 +86,62 @@ async function predict() {
     
     // 원본/화면에 보이는 비디오 사이즈 파악 및 프레임 추출
     const [imageData, originalImageWidth, originalImageHeight] = getOriginalVideoFrame(inputImage);
-    const screenImageWidth = inputImage.width;
-    const screenImageHeight = inputImage.height;
+    const screenImageWidth = inputImage.clientWidth;
+    const screenImageHeight = inputImage.clientHeight;
     const currentTimestamp = Date.now(); // 추출한 시각
     const input = tf.browser.fromPixels(imageData).div(255.0);
     let rescaledInput;
     
     // 사이즈 조정 단계. 모델이 640x360에서 aspectRatio == 16/9로 640x640로 늘어난 이미지를 학습했기 때문에 전처리 필요.
+    // 0. cropBox에 따라 잘라주기
     // 1. 16:9 비율로 현 이미지 세로 늘려줌
     // 2. padding으로 정사각형으로 만듦
     // 3. 640x640로 resize
-    
+
+    // 0. crop
+    const cropBox = document.querySelector('.area');
+    const cropStyle = cropBox.style.cssText;
+    // 화면에 보이는 cropBox 사이즈
+    const screenCropLeft = parseInt(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
+    const screenCropTop = parseInt(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
+    const screenCropWidth = parseInt(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
+    const screenCropHeight = parseInt(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
+    const widthFactor = originalImageWidth / screenImageWidth;
+    const heightFactor = originalImageHeight / screenImageHeight
+    // 입력할 cropBox 사이즈
+    const realCropLeft = parseInt(screenCropLeft*widthFactor);
+    const realCropTop = parseInt(screenCropTop*heightFactor);
+    const realCropWidth = parseInt(screenCropWidth*widthFactor);
+    const realCropHeight = parseInt(screenCropHeight*heightFactor);
+    // slice에 입력할 array
+    let cropStartPoint = [realCropTop, realCropLeft, 0]; // top, left, r (rgb의 r)
+    let cropSize = [realCropHeight, realCropWidth, 3];
+    rescaledInput = tf.slice(input, cropStartPoint, cropSize);
+    const [croppedHeight, croppedWidth] = rescaledInput.shape;
+
     // 1. 비율 늘려주기
-    const inputHeightIntermediate = Math.round(originalImageHeight * aspectRatio);
-    rescaledInput = tf.image.resizeBilinear(input, [inputHeightIntermediate, originalImageWidth], true);
+    const intermediateHeight = Math.round(croppedHeight * aspectRatio);
+    rescaledInput = tf.image.resizeBilinear(rescaledInput, [intermediateHeight, croppedWidth], true);
+
     // 2. padding
     let padAmount;
-    if (inputHeightIntermediate > originalImageWidth) { // 현재 이미지 height과 width 비교해서 이미지 padding 결정. y가 더 긺
-        padAmount = inputHeightIntermediate - originalImageWidth
-        rescaledInput = input.pad([
+    if (intermediateHeight > croppedWidth) { // 현재 이미지 height과 width 비교해서 이미지 padding 결정. y가 더 긺
+        padAmount = intermediateHeight - croppedWidth;
+        rescaledInput = rescaledInput.pad([
             [0,0],
             [0, padAmount],
             [0,0]
         ]);
     }
-    else if (inputHeightIntermediate < originalImageWidth) { // x가 더 긺
-        padAmount = originalImageWidth - inputHeightIntermediate
-        rescaledInput = input.pad([
+    else if (intermediateHeight < croppedWidth) { // x가 더 긺
+        padAmount = croppedWidth - intermediateHeight;
+        rescaledInput = rescaledInput.pad([
             [0, padAmount],
             [0,0],
             [0,0]
         ]);
     }
-    else { // 정사각형
-        rescaledInput = input
-    }
+
     // 3. resize
     rescaledInput = tf.image.resizeBilinear(rescaledInput, [inputWidth, inputHeight], true).expandDims(0); // yolo inputsize에 맞게 batchSize dimension 추가해주기
     
