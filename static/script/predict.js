@@ -100,12 +100,19 @@ async function predict() {
 
     // 0. crop
     const screenCropBox = document.getElementById('screenCropBox');
-    const cropStyle = screenCropBox.style.cssText;
-    // 화면에 보이는 cropBox 사이즈
-    const screenCropLeft = Math.round(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
-    const screenCropTop = Math.round(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
-    const screenCropWidth = Math.round(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
-    const screenCropHeight = Math.round(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
+    // 기본 view 사이즈
+    var screenCropLeft = 0;
+    var screenCropTop = 0;
+    var screenCropWidth = 640;
+    var screenCropHeight = 360;
+    if (screenCropBox) { // screenCropBox가 있는 경우 해당 사이즈
+        const cropStyle = screenCropBox.style.cssText;
+        // 화면에 보이는 cropBox 사이즈
+        screenCropLeft = Math.round(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
+        screenCropTop = Math.round(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
+        screenCropWidth = Math.round(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
+        screenCropHeight = Math.round(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
+    }
     const widthFactor = originalImageWidth / screenImageWidth;
     const heightFactor = originalImageHeight / screenImageHeight
     // 입력할 cropBox 사이즈
