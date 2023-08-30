@@ -74,6 +74,17 @@
       font-size: 15px;
       text-align: center;
   } */
+  .area {
+    position: absolute;
+    /* background-color:lightgray; */
+    border: 2px solid rgb(0, 140, 255);
+  }
+
+  #selection {
+    position: absolute;
+    /* background-color: lightblue; */
+    border: 2px solid rgb(0, 140, 255);
+  }
 
   .drawing {
       background: rgba(0, 255, 0, 0.25);

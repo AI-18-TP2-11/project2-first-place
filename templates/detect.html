@@ -11,6 +11,7 @@
     <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
 
     <script src="/static/script/predict.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
 
   <body>
@@ -58,6 +59,103 @@
                 //   location.reload();
                 //   console.log('what?')
                 // }
+                // declare some global variables
+                const view = document.getElementById('view');
+                let showSelection = false;
+                let Xstart;
+                let Ystart;
+
+                $(view).ready(function(){
+
+                    $(view).mousedown(function(event){
+                        // set a variable that indicates the user is drawing a selection
+                        showSelection=true;
+
+                        // save the position where the mouse click started
+                        Xstart=event.pageX - view.offsetLeft;
+                        Ystart=event.pageY - view.offsetTop;
+                        // Xstart=event.pageX;
+                        // Ystart=event.pageY;
+                        console.log('Xstart: ' + Xstart)
+                        console.log('Ystart: ' + Ystart)
+
+                        // create the select box element and give it some starting positions
+                        $('<div id="selection"></div>')
+                            .css({
+                                "left": Xstart + 'px',
+                                "top": Ystart + 'px',
+                            })
+                        .appendTo(view);
+                        $( ".area" ).remove();
+                    });
+
+                    $(view).mousemove(function(event){
+                        
+                        // if we are making a selection lets keep updating our select box dimensions
+                        if(showSelection == true) {
+                            
+                            // horizontal selection
+                            if (event.pageX-view.offsetLeft > Xstart) {
+                                // left to right
+                                $('#selection').css({
+                                    "width": (event.pageX-view.offsetLeft)-Xstart + 'px'
+                                    // "width": event.pageX-Xstart+view.offsetLeft + 'px'
+                                    // "width": event.pageX-Xstart + 'px'
+                                })
+                            }else {
+                                // right to left
+                                $('#selection').css({
+                                    "left": event.pageX-view.offsetLeft,
+                                    // "width": Xstart-event.pageX-view.offsetLeft + 'px'
+                                    "width": Xstart-(event.pageX-view.offsetLeft) + 'px'
+                                    // "width": Xstart-event.pageX + 'px'
+                                })
+                            }
+
+                            // vertical selection
+                            if (event.pageY-view.offsetTop > Ystart) {
+                                // top to bottom
+                                $('#selection').css({
+                                    "height": (event.pageY-view.offsetTop)-Ystart + 'px'
+                                    // "height": event.pageY-Ystart + 'px'
+                                })
+                            } else {
+                                // bottom to top
+                                $('#selection').css({
+                                    "top": (event.pageY-view.offsetTop),
+                                    "height": Ystart-(event.pageY-view.offsetTop) + 'px'
+                                    // "height": Ystart-event.pageY + 'px'
+                                })
+                            }
+                        }
+
+                    });
+
+                    $(view).mouseup(function(event){
+
+                        // we can borrow the needed values from the #selection element to draw our 'area' :)
+                        LeftVal = $("#selection").css('left')
+                        TopVal = $("#selection").css('top')
+                        WidthVal = $("#selection").css('width')
+                        HeightVal = $("#selection").css('height')
+
+                        // create the area element and give it the dimensions
+                        $('<div class="area"></div>')
+                            .css({
+                                "left": LeftVal,
+                                "top": TopVal,
+                                "width": WidthVal,
+                                "height": HeightVal
+                            })
+                            .appendTo(view);
+                        
+                        // get rid of the selection element from the DOM
+                        $( "#selection" ).remove();
+                        // and set our showSelection variable back to false
+                        showSelection=false;
+
+                    });
+                });
               </script>
             </div>
         </div>
