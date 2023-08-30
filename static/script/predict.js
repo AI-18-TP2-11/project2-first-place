@@ -37,8 +37,10 @@ const aspectRatio = 16/9
 const [inputWidth, inputHeight] = [640, 640];
 
 // 입력한 frame마다 pm 담아두는 변수
-var spms = []; // 비디오에 표기할 pm 담아두는 변수 (s: screen)
-var lpms = []; // 저장용 캔버스에 표기할 pm 담아두는 변수 (l: log)
+var spmsHolder = []; // 비디오에 표기할 pm 담아두는 변수 (s: screen)
+var lpmsHolder = []; // 저장용 캔버스에 표기할 pm 담아두는 변수 (l: log)
+var screenCropBoxHolder;
+var logCropBoxHolder;
 let canvasHolder; // 저장용 캔버스 담아두는 변수
 
 // yolov5 모델 함수
@@ -171,7 +173,7 @@ async function predict() {
 
     console.log(valid_detections_data)
     // 모델 한 번 입력시키고 화면에 그려줄지 확인하는 단계에서 이미 그려져 있는 부분 지우기
-    deletePms(spms, screenCropBox);
+    deletePms(spmsHolder, screenCropBox);
 
     // valid_detections가 있을 때에만, 즉 detection이 있는 경우 이후 과정 수행
     if (valid_detections_data > 0) {
@@ -211,7 +213,7 @@ async function predict() {
         const labels = labels_data.slice(0,valid_detections_data);
 
         // 그리기
-        drawBoundingBoxes(screen_bboxes, scores, labels, spms, screenCropBox);
+        drawBoundingBoxes(screen_bboxes, scores, labels, spmsHolder, screenCropBox);
 
         // 이미지 저장
         const logCropBox = document.createElement('div');
@@ -232,8 +234,10 @@ async function predict() {
 // 저장할 이미지 그리는 함수
 async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, logCropBox) {
     const div = document.getElementById('test');
-    deletePms(lpms, logCropBox); // 저장용 canvas 관리
-    
+    if (logCropBoxHolder){
+        deletePms(lpmsHolder, logCropBoxHolder); // 저장용 canvas 관리
+        div.removeChild(logCropBoxHolder);
+    }
     if (!canvasHolder) {
         const canvas = document.createElement("canvas");
         canvasHolder = canvas;
@@ -258,9 +262,10 @@ async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, logCro
     // div에 추가
     div.appendChild(canvas);
     div.appendChild(logCropBox);
+    logCropBoxHolder = logCropBox;
 
     // bounding box 그리고 div에 추가해서 div return
-    return drawBoundingBoxes(bboxes, scores, labels, lpms, logCropBox);
+    return drawBoundingBoxes(bboxes, scores, labels, lpmsHolder, logCropBox);
 }
 
 // 이미지와 bounding box 정보를 받아 JPG 파일로 저장합니다.
@@ -280,17 +285,17 @@ async function saveImage(image, bboxes, scores, labels, divTag, filename) {
 }
 
 // pm 요소 삭제하는 함수. 비디오에 그릴때랑 저장하는 canvas에 그릴 때 각각 사용
-function deletePms(pms, divTag) {
+function deletePms(pmsHolder, divTag) {
     // html에서 pm 지우기
-    for (let i=0; i < pms.length; i++) {
-        divTag.removeChild(pms[i])
+    for (let i=0; i < pmsHolder.length; i++) {
+        divTag.removeChild(pmsHolder[i])
     }
-    // pms에서 pm 지우기
-    pms.splice(0);
+    // pmsHolder에서 pm 지우기
+    pmsHolder.splice(0);
 }
 
 // 비디오에 그리는 함수
-function drawBoundingBoxes(bboxes, scores, labels, pms, divTag) {
+function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
     // bbox마다
     for (let n=0; n < bboxes.length; n++) {
         // label
@@ -313,8 +318,8 @@ function drawBoundingBoxes(bboxes, scores, labels, pms, divTag) {
             bboxes[n][3] + 'px;'
         divTag.appendChild(drawing);
         divTag.appendChild(labelDiv);
-        pms.push(drawing);
-        pms.push(labelDiv);
+        pmsHolder.push(drawing);
+        pmsHolder.push(labelDiv);
     }
     return divTag;
 }
