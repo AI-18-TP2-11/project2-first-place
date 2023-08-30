@@ -91,10 +91,6 @@
     border: 2px solid rgb(0, 140, 255);
   }
 
-  #logCropBox {
-    float: left;
-  }
-
   #selection {
     position: absolute;
     /* background-color: lightblue; */

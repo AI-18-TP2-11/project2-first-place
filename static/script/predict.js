@@ -39,8 +39,6 @@ const [inputWidth, inputHeight] = [640, 640];
 // 입력한 frame마다 pm 담아두는 변수
 var spmsHolder = []; // 비디오에 표기할 pm 담아두는 변수 (s: screen)
 var lpmsHolder = []; // 저장용 캔버스에 표기할 pm 담아두는 변수 (l: log)
-var screenCropBoxHolder;
-var logCropBoxHolder;
 let canvasHolder; // 저장용 캔버스 담아두는 변수
 
 // yolov5 모델 함수
@@ -173,7 +171,7 @@ async function predict() {
 
     console.log(valid_detections_data)
     // 모델 한 번 입력시키고 화면에 그려줄지 확인하는 단계에서 이미 그려져 있는 부분 지우기
-    deletePms(spmsHolder, screenCropBox);
+    deletePms(spmsHolder, view);
 
     // valid_detections가 있을 때에만, 즉 detection이 있는 경우 이후 과정 수행
     if (valid_detections_data > 0) {
@@ -187,20 +185,20 @@ async function predict() {
             // let sX2 = x2 * screenCropWidth;
             // let sY1 = y1 * screenCropHeight;
             // let sY2 = y2 * screenCropHeight;
-            let sX1 = x1 * screenCropHiddenWidth;
-            let sX2 = x2 * screenCropHiddenWidth;
-            let sY1 = y1 * screenCropHiddenHeight;
-            let sY2 = y2 * screenCropHiddenHeight;
+            let sX1 = (x1*screenCropHiddenWidth) + screenCropLeft;
+            let sX2 = (x2*screenCropHiddenWidth) + screenCropLeft;
+            let sY1 = (y1*screenCropHiddenHeight) + screenCropTop;
+            let sY2 = (y2*screenCropHiddenHeight) + screenCropTop;
             // let sX1 = x1 * screenCropHeight;
             // let sX2 = x2 * screenCropHeight;
             // let sY1 = y1 * screenCropWidth;
             // let sY2 = y2 * screenCropWidth;
             let sWidth = sX2 - sX1;
             let sHeight = sY2 - sY1;
-            let lX1 = x1 * realCropHiddenWidth;
-            let lX2 = x2 * realCropHiddenWidth;
-            let lY1 = y1 * realCropHiddenHeight;
-            let lY2 = y2 * realCropHiddenHeight;
+            let lX1 = (x1*realCropHiddenWidth) + realCropLeft;
+            let lX2 = (x2*realCropHiddenWidth) + realCropLeft;
+            let lY1 = (y1*realCropHiddenHeight) + realCropTop;
+            let lY2 = (y2*realCropHiddenHeight) + realCropTop;
             let lWidth = lX2 - lX1;
             let lHeight = lY2 - lY1;
             screen_bboxes.push([sX1, sY1, sWidth, sHeight]);
@@ -213,7 +211,7 @@ async function predict() {
         const labels = labels_data.slice(0,valid_detections_data);
 
         // 그리기
-        drawBoundingBoxes(screen_bboxes, scores, labels, spmsHolder, screenCropBox);
+        drawBoundingBoxes(screen_bboxes, scores, labels, spmsHolder, view);
 
         // 이미지 저장
         const logCropBox = document.createElement('div');
@@ -222,7 +220,7 @@ async function predict() {
             realCropTop + 'px; width: ' +
             realCropWidth + 'px; height: ' +
             realCropHeight + 'px;'
-        saveImage(imageData, log_bboxes, scores, labels, logCropBox, currentTimestamp + '.jpg');
+        saveImage(imageData, log_bboxes, scores, labels, currentTimestamp + '.jpg');
 
         // 로그 저장 bbox, score, label, timestamp, width, height, directory
         sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, currentTimestamp+'.jpg')
@@ -232,12 +230,9 @@ async function predict() {
 }
 
 // 저장할 이미지 그리는 함수
-async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, logCropBox) {
+async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels) {
     const div = document.getElementById('test');
-    if (logCropBoxHolder){
-        deletePms(lpmsHolder, logCropBoxHolder); // 저장용 canvas 관리
-        div.removeChild(logCropBoxHolder);
-    }
+    deletePms(lpmsHolder, div); // 저장용 canvas 관리
     if (!canvasHolder) {
         const canvas = document.createElement("canvas");
         canvasHolder = canvas;
@@ -261,16 +256,14 @@ async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, logCro
 
     // div에 추가
     div.appendChild(canvas);
-    div.appendChild(logCropBox);
-    logCropBoxHolder = logCropBox;
 
     // bounding box 그리고 div에 추가해서 div return
-    return drawBoundingBoxes(bboxes, scores, labels, lpmsHolder, logCropBox);
+    return drawBoundingBoxes(bboxes, scores, labels, lpmsHolder, div);
 }
 
 // 이미지와 bounding box 정보를 받아 JPG 파일로 저장합니다.
-async function saveImage(image, bboxes, scores, labels, divTag, filename) {            
-    const div = await drawBoundingBoxesToSave(image, bboxes, scores, labels, divTag);
+async function saveImage(image, bboxes, scores, labels, filename) {            
+    const div = await drawBoundingBoxesToSave(image, bboxes, scores, labels);
     html2canvas(div).then(canvas => {
         if (navigator.msSaveBlob) {
         var blob = canvas.msToBlob(); 
