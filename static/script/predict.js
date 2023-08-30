@@ -101,18 +101,12 @@ async function predict() {
     // 0. crop
     const screenCropBox = document.getElementById('screenCropBox');
     // 기본 view 사이즈
-    var screenCropLeft = 0;
-    var screenCropTop = 0;
-    var screenCropWidth = 640;
-    var screenCropHeight = 360;
-    if (screenCropBox) { // screenCropBox가 있는 경우 해당 사이즈
-        const cropStyle = screenCropBox.style.cssText;
-        // 화면에 보이는 cropBox 사이즈
-        screenCropLeft = Math.round(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
-        screenCropTop = Math.round(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
-        screenCropWidth = Math.round(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
-        screenCropHeight = Math.round(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
-    }
+    const cropStyle = screenCropBox.style.cssText;
+    // 화면에 보이는 cropBox 사이즈
+    const screenCropLeft = Math.round(screenCropBox.getAttribute('data-x'));
+    const screenCropTop = Math.round(screenCropBox.getAttribute('data-y'));
+    const screenCropWidth = Math.round(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
+    const screenCropHeight = Math.round(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
     const widthFactor = originalImageWidth / screenImageWidth;
     const heightFactor = originalImageHeight / screenImageHeight
     // 입력할 cropBox 사이즈
@@ -130,7 +124,6 @@ async function predict() {
     let cropStartPoint = [realCropTop, realCropLeft, 0]; // top, left, r (rgb의 r)
     let cropSize = [realCropHeight, realCropWidth, 3];
     rescaledInput = tf.slice(input, cropStartPoint, cropSize);
-    console.log(realCropHeight, realCropWidth)
 
     // 1. 비율 늘려주기
     const intermediateHeight = Math.round(realCropHeight * aspectRatio);
@@ -185,21 +178,12 @@ async function predict() {
         // bboxes_data는 1차원 배열. 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
         const screen_bboxes = []; // 표기
         const log_bboxes = []; // 로그/저장
-        console.log(screenCropHeight, screenCropWidth)
         for (let i = 0; i < valid_detections_data; i += 1) {
             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
-            // let sX1 = x1 * screenCropWidth;
-            // let sX2 = x2 * screenCropWidth;
-            // let sY1 = y1 * screenCropHeight;
-            // let sY2 = y2 * screenCropHeight;
             let sX1 = (x1*screenCropHiddenWidth) + screenCropLeft;
             let sX2 = (x2*screenCropHiddenWidth) + screenCropLeft;
             let sY1 = (y1*screenCropHiddenHeight) + screenCropTop;
             let sY2 = (y2*screenCropHiddenHeight) + screenCropTop;
-            // let sX1 = x1 * screenCropHeight;
-            // let sX2 = x2 * screenCropHeight;
-            // let sY1 = y1 * screenCropWidth;
-            // let sY2 = y2 * screenCropWidth;
             let sWidth = sX2 - sX1;
             let sHeight = sY2 - sY1;
             let lX1 = (x1*realCropHiddenWidth) + realCropLeft;
@@ -210,8 +194,6 @@ async function predict() {
             let lHeight = lY2 - lY1;
             screen_bboxes.push([sX1, sY1, sWidth, sHeight]);
             log_bboxes.push([lX1, lY1, lWidth, lHeight]);
-            // screen_bboxes.push([sY1, sX1, sHeight, sWidth]);
-            // log_bboxes.push([lY1, lX1, lHeight, lWidth]);
         }
 
         const scores = scores_data.slice(0,valid_detections_data);
@@ -238,7 +220,7 @@ async function predict() {
 
 // 저장할 이미지 그리는 함수
 async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels) {
-    const div = document.getElementById('test');
+    const div = document.getElementById('outputImage');
     deletePms(lpmsHolder, div); // 저장용 canvas 관리
     if (!canvasHolder) {
         const canvas = document.createElement("canvas");

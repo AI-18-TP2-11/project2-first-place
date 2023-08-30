@@ -1,3 +1,8 @@
+  .resize-drag {
+    color: rgba(0,0,0,0);
+    box-sizing: border-box;
+  }
+
   .container {
     display: flex;
     flex-direction: column; /* 세로 방향으로 정렬 */
@@ -42,15 +47,12 @@
   .drawBlock {
     display: inline-block;
     position: relative;
-    /* margin: 10px; */
     cursor: pointer;
   }
 
   .drawBlock p {
       position: absolute;
       margin: 0;
-      /* display: inline; */
-      /* padding: 0, 0, 0, 0; */
       align-self: flex-end;
       background-color: rgba(255, 111, 0, 0.25);
       color: #FFF;
@@ -60,27 +62,6 @@
       text-align: center;
   }
 
-  /* .test {
-      display: inline-block;
-      position: relative;
-      margin: 10px;
-      cursor: pointer;
-  } */
-
-  /* .test p {
-      position: absolute;
-      margin: 0;
-      display: inline;
-      padding: 0, 0, 0, 0;
-      align-self: flex-end;
-      background-color: rgba(255, 111, 0, 0.25);
-      color: #FFF;
-      border: 1px dashed rgba(255, 255, 255, 0.7);
-      z-index: 2;
-      font-size: 15px;
-      text-align: center;
-  } */
-
   .cropBox {
     position: absolute;
     /* background-color:lightgray; */
@@ -89,13 +70,6 @@
   
   #screenCropBox {
     border: 2px solid rgb(0, 140, 255);
-  }
-
-  #selection {
-    position: absolute;
-    /* background-color: lightblue; */
-    border: 2px solid rgb(0, 140, 255);
-    box-sizing: border-box;
   }
 
   .drawing {

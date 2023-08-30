@@ -10,6 +10,7 @@
     <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/static/script/crop.js" type="module"></script>
 
@@ -23,48 +24,50 @@
         <div class='left'>
             <div class='bar'>{{ region_and_name }}  실시간 cctv 영상</div>
             <div id="view" class="drawBlock">
-              <img id="inputVideo" width="640px" src="/static\images\C000002_003_0009_C_D_F_0.jpg">
-              <!-- <video id="inputVideo" controls width="640px" autoplay muted crossorigin="anonymous">
+              <!-- <img id="inputVideo" width="640px" src="/static\images\C000002_003_0009_C_D_F_0.jpg"> -->
+              <video id="inputVideo" controls width="640px" autoplay muted crossorigin="anonymous">
                 <source src="{{ video_src }}">
-              </video> -->
-              <div class="cropBox" id="screenCropBox" style="left: 0px; top: 0px; width: 640px; height: 360px;"></div>
-              <script>
-                const isM3u8 = '{{ video_src }}'.endsWith('m3u8');
-                function setM3u8Attributes(){
-                  var tagToRefresh = document.getElementById('inputVideo');
-                  tagToRefresh.setAttribute('data-setup', '{}');
-                  tagToRefresh.setAttribute('class', 'video-js');
-                }
-
-                if (isM3u8) {
-                  setM3u8Attributes();
-                  console.log('m3u8');
-                }
-                if (false) { // video.playing 확인 필요. listener 적용해볼 것
-                  console.log('비디오 재생중 아니기 때문에 reload')
-                  // https://stackoverflow.com/a/31133401
-                  Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
-                    get: function(){
-                        return !!(this.currentTime > 0 && !this.paused && !this.ended && this.readyState > 2);
-                    }
-                  })
-                  if (document.querySelector('video').playing){ // checks if element is playing right now
-                      // Do anything you want to
-                  }
-                }
-                
-                // // setTimeout(reload, 1000)
-                // function reload() {
-                //   // console.lo
-                //   const parent = document.getElementById('view');
-                //   var tagToRefresh = document.getElementById('inputVideo');
-                //   // parent.removeChild(tagToRefresh);
-                //   // parent.appendChild(tagToRefresh);
-                //   location.reload();
-                //   console.log('what?')
-                // }
-              </script>
+              </video>
+              <div class="cropBox resize-drag" id="screenCropBox" style="left: 0px; top: 0px; width: 640px; height: 360px;"></div>
             </div>
+            <script>
+              const isM3u8 = '{{ video_src }}'.endsWith('m3u8');
+              console.log('{{video_src}}')
+              console.log(isM3u8)
+              function setM3u8Attributes(){
+                var tagToRefresh = document.getElementById('inputVideo');
+                tagToRefresh.setAttribute('data-setup', '{}');
+                tagToRefresh.setAttribute('class', 'video-js');
+              }
+
+              if (isM3u8) {
+                setM3u8Attributes();
+                console.log('m3u8');
+              }
+              if (false) { // video.playing 확인 필요. listener 적용해볼 것
+                console.log('비디오 재생중 아니기 때문에 reload')
+                // https://stackoverflow.com/a/31133401
+                Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
+                  get: function(){
+                      return !!(this.currentTime > 0 && !this.paused && !this.ended && this.readyState > 2);
+                  }
+                })
+                if (document.querySelector('video').playing){ // checks if element is playing right now
+                    // Do anything you want to
+                }
+              }
+
+              // setTimeout(reload, 1000)
+              function reload() {
+                // console.lo
+                const parent = document.getElementById('view');
+                var tagToRefresh = document.getElementById('inputVideo');
+              //   parent.removeChild(tagToRefresh);
+              //   parent.appendChild(tagToRefresh);
+                location.reload();
+                console.log('what?')
+              }
+            </script>
         </div>
 
         <div class='right'>
@@ -95,7 +98,7 @@
       </div>
       <div class="subcontainer bottom">
         <div class='bar'>실시간 탐지 상황</div>
-        <div id="test" class="drawBlock"></div>
+        <div id="outputImage" class="drawBlock"></div>
       </div>
     </div>
 
