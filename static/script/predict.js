@@ -65,10 +65,10 @@ loadModel().then(model => {
 
 // video에서 원본 frame 추출
 function getOriginalVideoFrame(video) {
-    const width = video.videoWidth; // 비디오
-    const height = video.videoHeight; // 비디오
-    // const width = video.naturalWidth; // 이미지
-    // const height = video.naturalHeight; // 이미지
+    // const width = video.videoWidth; // 비디오
+    // const height = video.videoHeight; // 비디오
+    const width = video.naturalWidth; // 이미지
+    const height = video.naturalHeight; // 이미지
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -80,9 +80,9 @@ function getOriginalVideoFrame(video) {
 async function predict() {
     tf.engine().startScope(); // endScope까지 생성된 tensor 메모리에서 삭제
     // const inputImage = document.getElementById("inputImage"); // 이미지는 테스트용
-    // const inputImage = document.getElementById("inputVideo"); // 실제로는 이것으로
+    const inputImage = document.getElementById("inputVideo"); // 비디오 테스트용
     // const inputImage = document.getElementById("inputVideo_html5_api"); // m3u8 id
-    const inputImage = document.querySelector("video"); // id와 상관 없이 video
+    // const inputImage = document.querySelector("video"); // id와 상관 없이 video
     
     // 원본/화면에 보이는 비디오 사이즈 파악 및 프레임 추출
     const [imageData, originalImageWidth, originalImageHeight] = getOriginalVideoFrame(inputImage);
@@ -99,48 +99,62 @@ async function predict() {
     // 3. 640x640로 resize
 
     // 0. crop
-    const cropBox = document.querySelector('.area');
-    const cropStyle = cropBox.style.cssText;
+    const screenCropBox = document.getElementById('screenCropBox');
+    const cropStyle = screenCropBox.style.cssText;
     // 화면에 보이는 cropBox 사이즈
-    const screenCropLeft = parseInt(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
-    const screenCropTop = parseInt(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
-    const screenCropWidth = parseInt(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
-    const screenCropHeight = parseInt(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
+    const screenCropLeft = Math.round(cropStyle.match(/left:\s*([\d.]+)px/)[1]);
+    const screenCropTop = Math.round(cropStyle.match(/top:\s*([\d.]+)px/)[1]);
+    const screenCropWidth = Math.round(cropStyle.match(/width:\s*([\d.]+)px/)[1]);
+    const screenCropHeight = Math.round(cropStyle.match(/height:\s*([\d.]+)px/)[1]);
     const widthFactor = originalImageWidth / screenImageWidth;
     const heightFactor = originalImageHeight / screenImageHeight
     // 입력할 cropBox 사이즈
-    const realCropLeft = parseInt(screenCropLeft*widthFactor);
-    const realCropTop = parseInt(screenCropTop*heightFactor);
-    const realCropWidth = parseInt(screenCropWidth*widthFactor);
-    const realCropHeight = parseInt(screenCropHeight*heightFactor);
+    const realCropLeft = Math.round(screenCropLeft*widthFactor);
+    const realCropTop = Math.round(screenCropTop*heightFactor);
+    const realCropWidth = Math.round(screenCropWidth*widthFactor);
+    const realCropHeight = Math.round(screenCropHeight*heightFactor);
+    if (realCropLeft+realCropWidth > originalImageWidth) {
+        realCropWidth = originalImageWidth-realCropLeft;
+    }
+    if (realCropTop+realCropHeight > originalImageHeight) {
+        realCropHeight = originalImageHeight-realCropTop;
+    }
     // slice에 입력할 array
     let cropStartPoint = [realCropTop, realCropLeft, 0]; // top, left, r (rgb의 r)
     let cropSize = [realCropHeight, realCropWidth, 3];
     rescaledInput = tf.slice(input, cropStartPoint, cropSize);
-    const [croppedHeight, croppedWidth] = rescaledInput.shape;
+    console.log(realCropHeight, realCropWidth)
 
     // 1. 비율 늘려주기
-    const intermediateHeight = Math.round(croppedHeight * aspectRatio);
-    rescaledInput = tf.image.resizeBilinear(rescaledInput, [intermediateHeight, croppedWidth], true);
+    const intermediateHeight = Math.round(realCropHeight * aspectRatio);
+    rescaledInput = tf.image.resizeBilinear(rescaledInput, [intermediateHeight, realCropWidth], true);
 
     // 2. padding
     let padAmount;
-    if (intermediateHeight > croppedWidth) { // 현재 이미지 height과 width 비교해서 이미지 padding 결정. y가 더 긺
-        padAmount = intermediateHeight - croppedWidth;
+    if (intermediateHeight > realCropWidth) { // 현재 이미지 height과 width 비교해서 이미지 padding 결정. y가 더 긺
+        padAmount = intermediateHeight - realCropWidth;
         rescaledInput = rescaledInput.pad([
             [0,0],
             [0, padAmount],
             [0,0]
         ]);
     }
-    else if (intermediateHeight < croppedWidth) { // x가 더 긺
-        padAmount = croppedWidth - intermediateHeight;
+    else if (intermediateHeight < realCropWidth) { // x가 더 긺
+        padAmount = realCropWidth - intermediateHeight;
         rescaledInput = rescaledInput.pad([
             [0, padAmount],
             [0,0],
             [0,0]
         ]);
     }
+    // crop에 표기할 bounding box 표기할 비율 계산. pad하기 때문에 늘어난 비율만큼 cropBox에 적용해야 함
+    const [paddedHeight, paddedWidth] = rescaledInput.shape;
+    const padFactorX = paddedWidth / realCropWidth;
+    const padFactorY = paddedHeight / intermediateHeight;
+    const screenCropHiddenWidth = screenCropWidth * padFactorX;
+    const screenCropHiddenHeight = screenCropHeight * padFactorY;
+    const realCropHiddenWidth = realCropWidth * padFactorX;
+    const realCropHiddenHeight = realCropHeight * padFactorY;
 
     // 3. resize
     rescaledInput = tf.image.resizeBilinear(rescaledInput, [inputWidth, inputHeight], true).expandDims(0); // yolo inputsize에 맞게 batchSize dimension 추가해주기
@@ -157,40 +171,57 @@ async function predict() {
 
     console.log(valid_detections_data)
     // 모델 한 번 입력시키고 화면에 그려줄지 확인하는 단계에서 이미 그려져 있는 부분 지우기
-    deletePms(spms, view);
+    deletePms(spms, screenCropBox);
 
     // valid_detections가 있을 때에만, 즉 detection이 있는 경우 이후 과정 수행
     if (valid_detections_data > 0) {
-
         // bboxes_data는 1차원 배열. 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
         const screen_bboxes = []; // 표기
         const log_bboxes = []; // 로그/저장
+        console.log(screenCropHeight, screenCropWidth)
         for (let i = 0; i < valid_detections_data; i += 1) {
             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
-            let sX1 = x1 * screenImageWidth;
-            let sX2 = x2 * screenImageWidth;
-            let sY1 = y1 * screenImageHeight;
-            let sY2 = y2 * screenImageHeight;
+            // let sX1 = x1 * screenCropWidth;
+            // let sX2 = x2 * screenCropWidth;
+            // let sY1 = y1 * screenCropHeight;
+            // let sY2 = y2 * screenCropHeight;
+            let sX1 = x1 * screenCropHiddenWidth;
+            let sX2 = x2 * screenCropHiddenWidth;
+            let sY1 = y1 * screenCropHiddenHeight;
+            let sY2 = y2 * screenCropHiddenHeight;
+            // let sX1 = x1 * screenCropHeight;
+            // let sX2 = x2 * screenCropHeight;
+            // let sY1 = y1 * screenCropWidth;
+            // let sY2 = y2 * screenCropWidth;
             let sWidth = sX2 - sX1;
             let sHeight = sY2 - sY1;
-            let lX1 = x1 * originalImageWidth;
-            let lX2 = x2 * originalImageWidth;
-            let lY1 = y1 * originalImageHeight;
-            let lY2 = y2 * originalImageHeight;
+            let lX1 = x1 * realCropHiddenWidth;
+            let lX2 = x2 * realCropHiddenWidth;
+            let lY1 = y1 * realCropHiddenHeight;
+            let lY2 = y2 * realCropHiddenHeight;
             let lWidth = lX2 - lX1;
             let lHeight = lY2 - lY1;
             screen_bboxes.push([sX1, sY1, sWidth, sHeight]);
             log_bboxes.push([lX1, lY1, lWidth, lHeight]);
+            // screen_bboxes.push([sY1, sX1, sHeight, sWidth]);
+            // log_bboxes.push([lY1, lX1, lHeight, lWidth]);
         }
 
         const scores = scores_data.slice(0,valid_detections_data);
         const labels = labels_data.slice(0,valid_detections_data);
 
         // 그리기
-        drawBoundingBoxes(screen_bboxes, scores, labels, spms, view);
+        drawBoundingBoxes(screen_bboxes, scores, labels, spms, screenCropBox);
 
         // 이미지 저장
-        saveImage(imageData, log_bboxes, scores, labels, currentTimestamp + '.jpg');
+        const logCropBox = document.createElement('div');
+        logCropBox.setAttribute('class', 'cropBox');
+        logCropBox.style = 'left: ' + realCropLeft + 'px; top: ' +
+            realCropTop + 'px; width: ' +
+            realCropWidth + 'px; height: ' +
+            realCropHeight + 'px;'
+        test
+        saveImage(imageData, log_bboxes, scores, labels, logCropBox, currentTimestamp + '.jpg');
 
         // 로그 저장 bbox, score, label, timestamp, width, height, directory
         sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, currentTimestamp+'.jpg')
@@ -200,9 +231,9 @@ async function predict() {
 }
 
 // 저장할 이미지 그리는 함수
-async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels) {
-    const div = document.getElementById('test');
-    deletePms(lpms, div); // 저장용 canvas 관리
+async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels, divTag) {
+    const test = document.getElementById('test');
+    deletePms(lpms, divTag); // 저장용 canvas 관리
     
     if (!canvasHolder) {
         const canvas = document.createElement("canvas");
@@ -226,15 +257,16 @@ async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels) {
     ctx.putImageData(imageData, 0, 0);
 
     // div에 추가
-    div.appendChild(canvas);
+    divTag.appendChild(canvas);
+    test.appendChild(divTag);
 
     // bounding box 그리고 div에 추가해서 div return
-    return drawBoundingBoxes(bboxes, scores, labels, lpms, div);
+    return drawBoundingBoxes(bboxes, scores, labels, lpms, divTag);
 }
 
 // 이미지와 bounding box 정보를 받아 JPG 파일로 저장합니다.
-async function saveImage(image, bboxes, scores, labels, filename) {            
-    const div = await drawBoundingBoxesToSave(image, bboxes, scores, labels);
+async function saveImage(image, bboxes, scores, labels, divTag, filename) {            
+    const div = await drawBoundingBoxesToSave(image, bboxes, scores, labels, divTag);
     html2canvas(div).then(canvas => {
         if (navigator.msSaveBlob) {
         var blob = canvas.msToBlob(); 
@@ -243,7 +275,7 @@ async function saveImage(image, bboxes, scores, labels, filename) {
         var el = document.getElementById("target");
         el.href = canvas.toDataURL("image/jpeg");
         el.download = '파일명.jpg';
-        el.click();
+        // el.click();
         }
     });
 }

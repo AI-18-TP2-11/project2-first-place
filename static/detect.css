@@ -33,6 +33,12 @@
     display: block;
   }
 
+  #view {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+  }
+
   .drawBlock {
     display: inline-block;
     position: relative;
@@ -74,11 +80,19 @@
       font-size: 15px;
       text-align: center;
   } */
-  .area {
+
+  .cropBox {
     position: absolute;
     /* background-color:lightgray; */
-    border: 2px solid rgb(0, 140, 255);
     box-sizing: border-box;
+  }
+  
+  #screenCropBox {
+    border: 2px solid rgb(0, 140, 255);
+  }
+
+  #logCropBox {
+    float: left;
   }
 
   #selection {
