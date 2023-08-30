@@ -21,7 +21,15 @@
     display: block;
   }
 
-  .left p {
+  #view {
+    position: relative;
+    float: left;
+    width: 640;
+    margin: 10px;
+    cursor: pointer;
+  }
+
+  #view p {
       position: absolute;
       margin: 0;
       /* display: inline; */
@@ -35,7 +43,7 @@
       text-align: center;
   }
 
-  .test {
+  #test {
       position: relative;
       float: left;
       width: 640;
@@ -43,7 +51,7 @@
       cursor: pointer;
   }
 
-  .test p {
+  #test p {
       position: absolute;
       margin: 0;
       /* display: inline; */
