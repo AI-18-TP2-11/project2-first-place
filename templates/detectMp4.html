@@ -12,43 +12,48 @@
 
   <body>
     <a id="target" style="display: none"></a> <!--이미지 저장하기 위해 canvas 그리는 용도-->
-    <div class="top">
-      <div class='left'>
-          <div class='bar'>실시간 탐지 상황</div>
-          <div id="view">
-            <video id="inputVideo" controls width="640" height="360" autoplay muted crossorigin="anonymous">
-              <source src="{{ video_src }}">
-            </video>
-          </div>
+    <div class="container">
+      <div class="subcontainer top">
+        <div class='left'>
+            <div class='bar'>실시간 탐지 상황</div>
+            <div id="view" class="drawBlock">
+              <video id="inputVideo" controls width="640" height="360" autoplay muted crossorigin="anonymous">
+                <source src="{{ video_src }}">
+              </video>
+            </div>
+        </div>
+
+        <div class='right'>
+
+          <div class='bar'>로그</div>
+          
+          <table>
+            <tr style='text-align: center;'>
+              <td>ID</td>
+              <td>날짜</td>
+              <td>시간</td>
+              <td>위반사항</td>
+              <td>좌표</td>
+            <tr>
+            <tr style='text-align: center;'>
+              <td>--</td>
+              <td>--</td>
+              <td>--</td>
+              <td>--</td>
+              <td>--</td>
+            </tr>
+          </table>
+
+          <button class="save-button" type="button"> 영상 저장 </button>
+          <button class="save-button" type="button"> 이미지 저장 </button>
+
+        </div>
       </div>
-
-      <div class='right'>
-
-        <div class='bar'>로그</div>
-        
-        <table>
-          <tr style='text-align: center;'>
-            <td>ID</td>
-            <td>날짜</td>
-            <td>시간</td>
-            <td>위반사항</td>
-            <td>좌표</td>
-          <tr>
-          <tr style='text-align: center;'>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
-          </tr>
-        </table>
-
-        <button class="save-button" type="button"> 영상 저장 </button>
-        <button class="save-button" type="button"> 이미지 저장 </button>
-
+      <div class="subcontainer bottom">
+        <div class='bar'>뭐라불러요</div>
+        <div id="test" class="drawBlock"></div>
       </div>
     </div>
-    <div id="test" class="test"></div>
 
   </body>
 
