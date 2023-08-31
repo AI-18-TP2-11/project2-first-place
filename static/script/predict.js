@@ -59,7 +59,6 @@ loadModel().then(model => {
     yolov5 = model;
     // 3초 기다렸다가 실행. videoWidth, videoHeight가 0이 아닌 경우 .then하는 것 나중에 적용해보기
     setTimeout(function() {
-        // predict()
         setInterval(predict, 2000);
     }, 500);
 })
@@ -227,17 +226,21 @@ async function predict() {
                 filteredLabels.push(label);
             }
         }
-
+        
+        let filePath = null;
         // 재정렬한 labels length 0보다 크면, 즉 위반한 객체가 있으면
         if (filteredLabels.length > 0) {
             // 이미지 저장
             const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
-            const filePath = 'C:/cctv_images/' + fileName
-            saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기?
+            filePath = 'C:/cctv_images/' + fileName
+            // saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
+            saveImage(imageData, filteredLogBboxes, filteredScores, filteredLabels, fileName); // 저장할 때 정상 객체도 제외
 
             // 로그 저장 bbox, score, label, timestamp, width, height, region, directory
-            sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath)
+            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath) // 위반만 저장
         }
+        // 로그 저장 bbox, score, label, timestamp, width, height, region, directory(이미지 없으면 none)
+        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath) // 모두 저장
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
