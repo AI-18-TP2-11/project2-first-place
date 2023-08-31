@@ -66,7 +66,8 @@ loadModel().then(model => {
 // video에서 원본 frame 추출
 function getOriginalVideoFrame(video) {
     let width, height;
-    if (video.tagName == 'video') { // video
+    console.log(video.tagName)
+    if (video.tagName == 'VIDEO') { // video
         width = video.videoWidth;
         height = video.videoHeight;
     }
