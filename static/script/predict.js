@@ -1,4 +1,4 @@
-// iframe에 cctv api_url 입력하여 video 생성하는 함수.
+// iframe에 cctv api_url 입력하여 video 생성하는 함수. 사용 안 함
 function setIframeSrc() {
     const api_url = 'http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616' + '?time=' + new Date().valueOf()
     const cctvContainer = document.getElementById("cctvContainer");
@@ -31,6 +31,7 @@ const names =
     ['오토바이','오토바이 보행자도로 통행','오토바이 안전모 미착용','오토바이 무단횡단','오토바이 신호 위반','오토바이 정지선 위반','오토바이 횡단보도 주행',
     '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
     '킥보드','킥보드 캐리어','킥보드 보행자도로 통행','킥보드 안전모 미착용','킥보드 무단 횡단','킥보드 신호 위반','킥보드 횡단보도 주행','킥보드 동승자 탑승'];
+const goodIndexes = [0,7,8,15,16]; // 오토바이, 자전거, 킥보드, 캐리어
 
 // 학습 데이터 원본 이미지 비율. 이것으로 예측 데이터 이미지 비율 조정 필요
 const aspectRatio = 16/9
@@ -66,7 +67,6 @@ loadModel().then(model => {
 // video에서 원본 frame 추출
 function getOriginalVideoFrame(video) {
     let width, height;
-    console.log(video.tagName)
     if (video.tagName == 'VIDEO') { // video
         width = video.videoWidth;
         height = video.videoHeight;
@@ -215,17 +215,15 @@ async function predict() {
         // 그리기
         drawBoundingBoxes(screen_bboxes, scores, labels, spmsHolder, view);
 
+        // if all(i in goodIndexes for i in labels): return
+        // else {이미지 저장, refactor, sendPostRequest}
         // 이미지 저장
-        const logCropBox = document.createElement('div');
-        logCropBox.setAttribute('class', 'cropBox');
-        logCropBox.style = 'left: ' + realCropLeft + 'px; top: ' +
-            realCropTop + 'px; width: ' +
-            realCropWidth + 'px; height: ' +
-            realCropHeight + 'px;'
-        saveImage(imageData, log_bboxes, scores, labels, currentTimestamp + '.jpg');
+        const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
+        const filePath = 'C:/cctv_images/' + fileName
+        saveImage(imageData, log_bboxes, scores, labels, fileName);
 
         // 로그 저장 bbox, score, label, timestamp, width, height, directory
-        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, currentTimestamp+'.jpg')
+        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath)
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
@@ -264,17 +262,17 @@ async function drawBoundingBoxesToSave(imageData, bboxes, scores, labels) {
 }
 
 // 이미지와 bounding box 정보를 받아 JPG 파일로 저장합니다.
-async function saveImage(image, bboxes, scores, labels, filename) {            
+async function saveImage(image, bboxes, scores, labels, fileName) {
     const div = await drawBoundingBoxesToSave(image, bboxes, scores, labels);
     html2canvas(div).then(canvas => {
         if (navigator.msSaveBlob) {
         var blob = canvas.msToBlob(); 
-        return navigator.msSaveBlob(blob, '파일명.jpg'); 
+        return navigator.msSaveBlob(blob, fileName+'.jpg'); 
         } else { 
         var el = document.getElementById("target");
         el.href = canvas.toDataURL("image/jpeg");
-        el.download = '파일명.jpg';
-        // el.click();
+        el.download = fileName+'.jpg';
+        el.click();
         }
     });
 }
@@ -320,7 +318,7 @@ function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
 }
 
 // bbox, score, label, timestamp, imgsz, directory
-async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, img_directory) {
+async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, region_and_name, img_directory) {
     // POST 요청을 보낼 데이터를 준비합니다.
     var data = {
         "bboxes": bboxes,
@@ -329,6 +327,7 @@ async function sendPostRequest(bboxes, scores, labels, timestamp, width, height,
         'timestamp': timestamp,
         'width': width,
         'height': height,
+        'region_and_name': region_and_name,
         'img_directory': img_directory
     };
     // POST 요청을 보냅니다.

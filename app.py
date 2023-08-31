@@ -46,7 +46,7 @@ def select():
 def test_post():
     '''
     javascript에서 로그 받아오기\n
-    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', 'img_directory']
+    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_directory']
     '''
     data = request.json
     bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
@@ -55,6 +55,7 @@ def test_post():
     timestamp = data['timestamp'] # unix
     width = data['width'] # 이미지 width
     height = data['height'] # 이미지 height
+    region_and_name = data['region_and_name']
     img_directory = data['img_directory'] # 이미지 저장 경로
     print(data.values())
     return '보내기 성공', 200

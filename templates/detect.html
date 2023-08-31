@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/static/script/crop.js" type="module"></script>
 
+    <script>const region_and_name = '{{ region_and_name }}';</script>
     <script src="/static/script/predict.js" type="module"></script>
   </head>
 
@@ -50,19 +51,14 @@
               }
 
               function reloadMp4() {
+                console.log('비디오 reload')
                 const parent = document.getElementById('view');
                 const tagToRefresh = document.getElementById('inputVideo');
                 const source = document.createElement('source');
-                // source.setAttribute('src', 'http://210.179.218.52:1935/live/177.stream/playlist.m3u8')
                 const video = document.querySelector('video')
                 video.pause();
-                // tagToRefresh.appendChild(source)
-                // parent.removeChild(tagToRefresh);
-                // parent.appendChild(tagToRefresh);
                 video.load();
                 video.play();
-                // location.reload();
-                console.log('what?')
               }
             </script>
         </div>
