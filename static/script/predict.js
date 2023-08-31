@@ -31,7 +31,7 @@ const names =
     ['오토바이','오토바이 보행자도로 통행','오토바이 안전모 미착용','오토바이 무단횡단','오토바이 신호 위반','오토바이 정지선 위반','오토바이 횡단보도 주행',
     '자전거','자전거 캐리어','자전거 보행자도로 통행','자전거 안전모 미착용','자전거 무단 횡단','자전거 신호 위반','자전거 정지선 위반','자전거 횡단보도 주행',
     '킥보드','킥보드 캐리어','킥보드 보행자도로 통행','킥보드 안전모 미착용','킥보드 무단 횡단','킥보드 신호 위반','킥보드 횡단보도 주행','킥보드 동승자 탑승'];
-const goodIndexes = [0,7,8,15,16]; // 오토바이, 자전거, 킥보드, 캐리어
+const goodLabels = [0,7,8,15,16]; // 오토바이, 자전거, 킥보드, 캐리어 등 위반 안 한 PM index
 
 // 학습 데이터 원본 이미지 비율. 이것으로 예측 데이터 이미지 비율 조정 필요
 const aspectRatio = 16/9
@@ -215,15 +215,29 @@ async function predict() {
         // 그리기
         drawBoundingBoxes(screen_bboxes, scores, labels, spmsHolder, view);
 
-        // if all(i in goodIndexes for i in labels): return
-        // else {이미지 저장, refactor, sendPostRequest}
-        // 이미지 저장
-        const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
-        const filePath = 'C:/cctv_images/' + fileName
-        saveImage(imageData, log_bboxes, scores, labels, fileName);
+        // 위반사항 아닌 경우 로그 남기지 않기 위한 계산
+        const filteredLogBboxes = [];
+        const filteredScores = [];
+        const filteredLabels = [];
+        for (let i = 0; i < labels.length; i++) {
+            const label = labels[i];
+            if (!goodLabels.includes(label)) {
+                filteredLogBboxes.push(log_bboxes[i]);
+                filteredScores.push(scores[i]);
+                filteredLabels.push(label);
+            }
+        }
 
-        // 로그 저장 bbox, score, label, timestamp, width, height, directory
-        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath)
+        // 재정렬한 labels length 0보다 크면, 즉 위반한 객체가 있으면
+        if (filteredLabels.length > 0) {
+            // 이미지 저장
+            const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
+            const filePath = 'C:/cctv_images/' + fileName
+            saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기?
+
+            // 로그 저장 bbox, score, label, timestamp, width, height, region, directory
+            sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath)
+        }
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
