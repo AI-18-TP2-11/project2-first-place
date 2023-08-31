@@ -65,10 +65,15 @@ loadModel().then(model => {
 
 // video에서 원본 frame 추출
 function getOriginalVideoFrame(video) {
-    // const width = video.videoWidth; // 비디오
-    // const height = video.videoHeight; // 비디오
-    const width = video.naturalWidth; // 이미지
-    const height = video.naturalHeight; // 이미지
+    let width, height;
+    if (video.tagName == 'video') { // video
+        width = video.videoWidth;
+        height = video.videoHeight;
+    }
+    else { // 테스트용 이미지
+        width = video.naturalWidth;
+        height = video.naturalHeight;
+    }
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -80,9 +85,16 @@ function getOriginalVideoFrame(video) {
 async function predict() {
     tf.engine().startScope(); // endScope까지 생성된 tensor 메모리에서 삭제
     // const inputImage = document.getElementById("inputImage"); // 이미지는 테스트용
-    const inputImage = document.getElementById("inputVideo"); // 비디오 테스트용
+    // const inputImage = document.getElementById("inputVideo"); // 비디오 테스트용
     // const inputImage = document.getElementById("inputVideo_html5_api"); // m3u8 id
     // const inputImage = document.querySelector("video"); // id와 상관 없이 video
+    let inputImage;
+    if (document.querySelector('video')) {
+        inputImage = document.querySelector("video"); // id와 상관 없이 video
+    }
+    else {
+        inputImage = document.getElementById('inputImage'); // 테스트용 이미지
+    }
     
     // 원본/화면에 보이는 비디오 사이즈 파악 및 프레임 추출
     const [imageData, originalImageWidth, originalImageHeight] = getOriginalVideoFrame(inputImage);

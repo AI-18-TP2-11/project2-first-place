@@ -64,12 +64,11 @@
 
   .cropBox {
     position: absolute;
-    /* background-color:lightgray; */
     box-sizing: border-box;
   }
   
   #screenCropBox {
-    border: 2px solid rgb(0, 140, 255);
+    border: 3px solid rgb(0, 140, 255);
   }
 
   .drawing {
