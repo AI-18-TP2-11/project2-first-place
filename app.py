@@ -89,8 +89,47 @@ def test_post():
 
     print(data.values())
 
-    # 보낼 데이터
+    # db로 데이터 전송
     zipped = zip(bboxes, scores, labels)
+    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_directory)
+
+    return 'flask 및 db로 전송 성공', 200
+
+@app.route('/upload_generated_dataasdfasdfafsdafsdafsd')
+def upload_generated_data():
+    '생성한 데이터 업로드'
+    import pandas as pd
+    df = pd.read_csv('generated_data4.csv')
+    add_all_generated(df.values.tolist())
+
+def add_all_generated(bulk_data):
+    data_to_insert = []
+    for datapoint in bulk_data:
+        print(datapoint)
+        print(len(datapoint))
+        data_to_insert.append(
+            Submission(
+                cctv_id = datapoint[0],
+                cctv_name = datapoint[1],
+                center_name = datapoint[2],
+                timestamp = datapoint[3],
+                x = datapoint[4],
+                y = datapoint[5],
+                bwidth = datapoint[6],
+                bheight = datapoint[7],
+                width = datapoint[8],
+                height = datapoint[9],
+                score = datapoint[10],
+                label = datapoint[11],
+                img_directory = datapoint[12]
+            )
+        )
+
+    db.session.add_all(data_to_insert)
+    db.session.commit()
+    return '생성 데이터 업로드 성공', 200
+
+def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_directory):
     data_to_insert = [
         Submission(
             cctv_id = cctv_id,
@@ -111,9 +150,7 @@ def test_post():
     ]
 
     db.session.add_all(data_to_insert)
-    db.session.commit()    
-
-    return 'flask 및 db로 전송 성공', 200
+    db.session.commit()
 
 if __name__ == '__main__':
     with app.app_context():
