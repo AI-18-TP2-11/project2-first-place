@@ -192,6 +192,10 @@ async function predict() {
         const log_bboxes = []; // 로그/저장
         for (let i = 0; i < valid_detections_data; i += 1) {
             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
+            if (x1 < 0) {x1 = 0}
+            if (y1 < 0) {y1 = 0}
+            if (x2 > 1) {x2 = 1}
+            if (y2 > 1) {y2 = 1}
             let sX1 = (x1*screenCropHiddenWidth) + screenCropLeft;
             let sX2 = (x2*screenCropHiddenWidth) + screenCropLeft;
             let sY1 = (y1*screenCropHiddenHeight) + screenCropTop;

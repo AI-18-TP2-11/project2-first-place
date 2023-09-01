@@ -1,0 +1,142 @@
+2023-08-16 14:01:38,341 INFO    StreamThr :25392 [internal.py:wandb_internal():86] W&B internal server running at pid: 25392, started at: 2023-08-16 14:01:38.341584
+2023-08-16 14:01:38,343 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: status
+2023-08-16 14:01:38,352 INFO    WriterThread:25392 [datastore.py:open_for_write():85] open: C:\Users\jinmo\Documents\GitHub\tp2\wandb\offline-run-20230816_140138-x71r7vmz\run-x71r7vmz.wandb
+2023-08-16 14:01:38,385 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: run_start
+2023-08-16 14:01:38,394 DEBUG   HandlerThread:25392 [system_info.py:__init__():31] System info init
+2023-08-16 14:01:38,395 DEBUG   HandlerThread:25392 [system_info.py:__init__():46] System info init done
+2023-08-16 14:01:38,395 INFO    HandlerThread:25392 [system_monitor.py:start():181] Starting system monitor
+2023-08-16 14:01:38,395 INFO    SystemMonitor:25392 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-08-16 14:01:38,395 INFO    HandlerThread:25392 [system_monitor.py:probe():201] Collecting system info
+2023-08-16 14:01:38,399 INFO    SystemMonitor:25392 [interfaces.py:start():190] Started cpu monitoring
+2023-08-16 14:01:38,402 DEBUG   HandlerThread:25392 [system_info.py:probe():195] Probing system
+2023-08-16 14:01:38,402 INFO    SystemMonitor:25392 [interfaces.py:start():190] Started disk monitoring
+2023-08-16 14:01:38,408 INFO    SystemMonitor:25392 [interfaces.py:start():190] Started memory monitoring
+2023-08-16 14:01:38,415 INFO    SystemMonitor:25392 [interfaces.py:start():190] Started network monitoring
+2023-08-16 14:01:38,416 DEBUG   HandlerThread:25392 [system_info.py:_probe_git():180] Probing git
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_info.py:_probe_git():188] Probing git done
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_info.py:probe():240] Probing system done
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_monitor.py:probe():210] {'os': 'Windows-10-10.0.22621-SP0', 'python': '3.9.17', 'heartbeatAt': '2023-08-16T05:01:38.402748', 'startedAt': '2023-08-16T05:01:38.332770', 'docker': None, 'cuda': None, 'args': ('--data', 'C:UsersjinmoDocumentsGitHubtp2traintrain_det_onlydatadet.yml', '--weights', 'yolov5s.pt', '--img', '640'), 'state': 'running', 'program': 'C:\\Users\\jinmo\\Documents\\GitHub\\tp2\\master-sau\\yolov5\\train.py', 'codePath': 'master-sau\\yolov5\\train.py', 'git': {'remote': 'git@github.com:AI-18-TP2-11/project2-first-place.git', 'commit': '9d3d04eb5f12b67698cee188cb693d48e2150d51'}, 'email': 'yjmd2222@gmail.com', 'root': 'C:/Users/jinmo/Documents/GitHub/tp2', 'host': 'jinmos_desktop', 'username': 'jinmo', 'executable': 'C:\\Users\\jinmo\\anaconda3\\envs\\yolov5-custom\\python.exe', 'cpu_count': 4, 'cpu_count_logical': 8, 'cpu_freq': {'current': 3300.0, 'min': 0.0, 'max': 3300.0}, 'cpu_freq_per_core': [{'current': 3300.0, 'min': 0.0, 'max': 3300.0}], 'disk': {'total': 447.11425399780273, 'used': 367.6372985839844}, 'memory': {'total': 15.843452453613281}}
+2023-08-16 14:01:38,459 INFO    HandlerThread:25392 [system_monitor.py:probe():211] Finished collecting system info
+2023-08-16 14:01:38,459 INFO    HandlerThread:25392 [system_monitor.py:probe():214] Publishing system info
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_info.py:_save_pip():67] Saving pip packages done
+2023-08-16 14:01:38,459 DEBUG   HandlerThread:25392 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-08-16 14:01:38,461 ERROR   HandlerThread:25392 [system_info.py:_save_conda():85] Error saving conda packages: [WinError 2] 지정된 파일을 찾을 수 없습니다
+Traceback (most recent call last):
+  File "C:\Users\jinmo\anaconda3\envs\yolov5-custom\lib\site-packages\wandb\sdk\internal\system\system_info.py", line 81, in _save_conda
+    subprocess.call(
+  File "C:\Users\jinmo\anaconda3\envs\yolov5-custom\lib\subprocess.py", line 349, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "C:\Users\jinmo\anaconda3\envs\yolov5-custom\lib\subprocess.py", line 951, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Users\jinmo\anaconda3\envs\yolov5-custom\lib\subprocess.py", line 1436, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+FileNotFoundError: [WinError 2] 지정된 파일을 찾을 수 없습니다
+2023-08-16 14:01:38,463 DEBUG   HandlerThread:25392 [system_info.py:_save_conda():86] Saving conda packages done
+2023-08-16 14:01:38,464 INFO    HandlerThread:25392 [system_monitor.py:probe():216] Finished publishing system info
+2023-08-16 14:01:41,044 DEBUG   SenderThread:25392 [sender.py:send():379] send: exit
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:send_exit():584] handling exit code: 1
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:send_exit():586] handling runtime: 2
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:send_exit():592] send defer
+2023-08-16 14:01:41,045 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,045 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 0
+2023-08-16 14:01:41,045 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 0
+2023-08-16 14:01:41,045 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 1
+2023-08-16 14:01:41,046 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,046 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 1
+2023-08-16 14:01:41,046 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,046 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 1
+2023-08-16 14:01:41,046 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 2
+2023-08-16 14:01:41,046 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,046 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 2
+2023-08-16 14:01:41,047 INFO    HandlerThread:25392 [system_monitor.py:finish():190] Stopping system monitor
+2023-08-16 14:01:41,047 DEBUG   SystemMonitor:25392 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-08-16 14:01:41,047 INFO    HandlerThread:25392 [interfaces.py:finish():202] Joined cpu monitor
+2023-08-16 14:01:41,047 DEBUG   SystemMonitor:25392 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2023-08-16 14:01:41,048 DEBUG   SystemMonitor:25392 [system_monitor.py:_start():170] Publishing last batch of metrics
+2023-08-16 14:01:41,048 INFO    HandlerThread:25392 [interfaces.py:finish():202] Joined disk monitor
+2023-08-16 14:01:41,048 INFO    HandlerThread:25392 [interfaces.py:finish():202] Joined memory monitor
+2023-08-16 14:01:41,048 INFO    HandlerThread:25392 [interfaces.py:finish():202] Joined network monitor
+2023-08-16 14:01:41,048 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,048 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 2
+2023-08-16 14:01:41,048 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 3
+2023-08-16 14:01:41,048 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,049 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 3
+2023-08-16 14:01:41,049 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,049 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 3
+2023-08-16 14:01:41,049 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 4
+2023-08-16 14:01:41,049 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,049 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 4
+2023-08-16 14:01:41,050 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,050 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 4
+2023-08-16 14:01:41,050 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 5
+2023-08-16 14:01:41,050 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,050 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 5
+2023-08-16 14:01:41,050 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,050 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 5
+2023-08-16 14:01:41,051 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 6
+2023-08-16 14:01:41,051 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,051 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 6
+2023-08-16 14:01:41,051 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,051 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 6
+2023-08-16 14:01:41,051 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 7
+2023-08-16 14:01:41,051 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: status_report
+2023-08-16 14:01:41,051 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,051 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: status_report
+2023-08-16 14:01:41,051 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 7
+2023-08-16 14:01:41,051 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,051 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 7
+2023-08-16 14:01:41,051 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 8
+2023-08-16 14:01:41,051 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,051 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 8
+2023-08-16 14:01:41,052 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,052 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 8
+2023-08-16 14:01:41,052 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 9
+2023-08-16 14:01:41,052 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,052 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 9
+2023-08-16 14:01:41,052 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,052 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 9
+2023-08-16 14:01:41,052 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 10
+2023-08-16 14:01:41,052 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,052 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 10
+2023-08-16 14:01:41,052 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 10
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 11
+2023-08-16 14:01:41,053 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,053 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 11
+2023-08-16 14:01:41,053 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 11
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 12
+2023-08-16 14:01:41,053 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,053 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 12
+2023-08-16 14:01:41,053 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 12
+2023-08-16 14:01:41,053 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 13
+2023-08-16 14:01:41,053 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,054 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 13
+2023-08-16 14:01:41,054 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,054 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 13
+2023-08-16 14:01:41,054 INFO    SenderThread:25392 [sender.py:transition_state():612] send defer: 14
+2023-08-16 14:01:41,054 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: defer
+2023-08-16 14:01:41,054 DEBUG   SenderThread:25392 [sender.py:send():379] send: final
+2023-08-16 14:01:41,054 INFO    HandlerThread:25392 [handler.py:handle_request_defer():170] handle defer: 14
+2023-08-16 14:01:41,054 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: defer
+2023-08-16 14:01:41,055 INFO    SenderThread:25392 [sender.py:send_request_defer():608] handle sender defer: 14
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: poll_exit
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: poll_exit
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: server_info
+2023-08-16 14:01:41,055 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: poll_exit
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: get_summary
+2023-08-16 14:01:41,055 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: poll_exit
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: sampled_history
+2023-08-16 14:01:41,055 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: server_info
+2023-08-16 14:01:41,055 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: job_info
+2023-08-16 14:01:41,056 DEBUG   SenderThread:25392 [sender.py:send_request():406] send_request: job_info
+2023-08-16 14:01:41,056 INFO    MainThread:25392 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2023-08-16 14:01:41,056 INFO    MainThread:25392 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2023-08-16 14:01:41,056 DEBUG   HandlerThread:25392 [handler.py:handle_request():144] handle_request: shutdown
+2023-08-16 14:01:41,056 INFO    HandlerThread:25392 [handler.py:finish():857] shutting down handler
+2023-08-16 14:01:42,056 INFO    WriterThread:25392 [datastore.py:close():294] close: C:\Users\jinmo\Documents\GitHub\tp2\wandb\offline-run-20230816_140138-x71r7vmz\run-x71r7vmz.wandb
+2023-08-16 14:01:42,056 INFO    SenderThread:25392 [sender.py:finish():1552] shutting down sender

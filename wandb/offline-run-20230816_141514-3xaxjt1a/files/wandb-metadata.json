@@ -1,0 +1,49 @@
+{
+    "os": "Windows-10-10.0.22621-SP0",
+    "python": "3.9.17",
+    "heartbeatAt": "2023-08-16T05:15:14.709718",
+    "startedAt": "2023-08-16T05:15:14.648497",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--data",
+        "C:\\Users\\jinmo\\Documents\\GitHub\\tp2\\master-sau\\yolov5\\data\\coco.yaml",
+        "--weights",
+        "yolov5s.pt",
+        "--img",
+        "640"
+    ],
+    "state": "running",
+    "program": "C:\\Users\\jinmo\\Documents\\GitHub\\tp2\\master-sau\\yolov5\\train.py",
+    "codePath": "master-sau\\yolov5\\train.py",
+    "git": {
+        "remote": "git@github.com:AI-18-TP2-11/project2-first-place.git",
+        "commit": "9d3d04eb5f12b67698cee188cb693d48e2150d51"
+    },
+    "email": "yjmd2222@gmail.com",
+    "root": "C:/Users/jinmo/Documents/GitHub/tp2",
+    "host": "jinmos_desktop",
+    "username": "jinmo",
+    "executable": "C:\\Users\\jinmo\\anaconda3\\envs\\yolov5-custom\\python.exe",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 3300.0,
+        "min": 0.0,
+        "max": 3300.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3300.0,
+            "min": 0.0,
+            "max": 3300.0
+        }
+    ],
+    "disk": {
+        "total": 447.11425399780273,
+        "used": 369.63256454467773
+    },
+    "memory": {
+        "total": 15.843452453613281
+    }
+}

@@ -53,14 +53,20 @@ def select():
 
 # DB 생성 형식
 class Submission(db.Model):
+    # cctv_id, cctv_name, center_name, timestamp, x1, x2, y1, y2, width, height, score, label, img_directory
     id = db.Column(db.Integer, primary_key=True)
-    bboxes = db.Column(db.String)
-    scores = db.Column(db.String)
-    labels = db.Column(db.String)
+    cctv_id = db.Column(db.String)
+    cctv_name = db.Column(db.String)
+    center_name = db.Column(db.String)
     timestamp = db.Column(db.Integer)
+    x = db.Column(db.Float)
+    y = db.Column(db.Float)
+    bwidth = db.Column(db.Float)
+    bheight = db.Column(db.Float)
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
-    region_and_name = db.Column(db.String)
+    score = db.Column(db.Float)
+    label = db.Column(db.String)
     img_directory = db.Column(db.String)
 
 @app.route('/test', methods=['POST'])
@@ -70,36 +76,44 @@ def test_post():
     현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_directory']
     '''
     data = request.json
-    bboxes = json.dumps(data['bboxes']) # json 문자열
-    scores = json.dumps(data['scores']) # json 문자열
-    labels = json.dumps(data['labels']) # json 문자열
+    bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
+    scores = data['scores'] # [0.6, 0.89,...]
+    labels = data['labels'] # [0, 4,...] # yolo 라벨 0-23
     timestamp = data['timestamp'] # unix
     width = data['width'] # 이미지 width
     height = data['height'] # 이미지 height
     cctv_id = data['cctv_id'] # cctv id
-    region_and_name = data['region_and_name'] # cctv name
     cctv_name = data['cctv_name'] # cctv name
     center_name = data['center_name'] # center name
     img_directory = data['img_directory'] # 이미지 저장 경로
 
     print(data.values())
 
-    # DB 형식
-    submission = Submission(
-        bboxes=bboxes,
-        scores=scores,
-        labels=labels,
-        timestamp=timestamp,
-        width=width,
-        height=height,
-        region_and_name=region_and_name,
-        img_directory=img_directory
-    )
-    
-    db.session.add(submission)
+    # 보낼 데이터
+    zipped = zip(bboxes, scores, labels)
+    data_to_insert = [
+        Submission(
+            cctv_id = cctv_id,
+            cctv_name = cctv_name,
+            center_name = center_name,
+            timestamp = timestamp,
+            x = bbox[0],
+            y = bbox[1],
+            bwidth = bbox[2],
+            bheight = bbox[3],
+            width = width,
+            height = height,
+            score = score,
+            label = label,
+            img_directory = img_directory
+        )
+        for bbox, score, label in zipped
+    ]
+
+    db.session.add_all(data_to_insert)
     db.session.commit()    
 
-    return '보내기 성공', 200
+    return 'flask 및 db로 전송 성공', 200
 
 if __name__ == '__main__':
     with app.app_context():
