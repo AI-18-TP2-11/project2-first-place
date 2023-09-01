@@ -2,8 +2,13 @@ from flask import Flask, render_template, request, send_file
 import os
 import csv
 from get_video_src import get_video_src
+from flask_sqlalchemy import SQLAlchemy
+import json
+
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///submission.db'  # SQLite 데이터베이스를 사용합니다.
+db = SQLAlchemy(app)
 
 @app.route('/')
 def index():
@@ -42,6 +47,18 @@ def select():
     csv_data = parse_csv()
     return render_template('select.html', csv_data=csv_data)
 
+# DB 생성 형식
+class Submission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bboxes = db.Column(db.String)
+    scores = db.Column(db.String)
+    labels = db.Column(db.String)
+    timestamp = db.Column(db.Integer)
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
+    region_and_name = db.Column(db.String)
+    img_directory = db.Column(db.String)
+
 @app.route('/test', methods=['POST'])
 def test_post():
     '''
@@ -49,16 +66,35 @@ def test_post():
     현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_directory']
     '''
     data = request.json
-    bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
-    scores = data['scores'] # [0.6, 0.89,...]
-    labels = data['labels'] # [0, 4,...] # yolo 라벨 0-23
+    bboxes = json.dumps(data['bboxes']) # json 문자열
+    scores = json.dumps(data['scores']) # json 문자열
+    labels = json.dumps(data['labels']) # json 문자열
     timestamp = data['timestamp'] # unix
     width = data['width'] # 이미지 width
     height = data['height'] # 이미지 height
     region_and_name = data['region_and_name']
     img_directory = data['img_directory'] # 이미지 저장 경로
+
     print(data.values())
+
+    # DB 형식
+    submission = Submission(
+        bboxes=bboxes,
+        scores=scores,
+        labels=labels,
+        timestamp=timestamp,
+        width=width,
+        height=height,
+        region_and_name=region_and_name,
+        img_directory=img_directory
+    )
+    
+    db.session.add(submission)
+    db.session.commit()    
+
     return '보내기 성공', 200
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
