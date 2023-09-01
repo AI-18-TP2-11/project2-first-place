@@ -69,7 +69,6 @@
       function showMessageBox(url, cctvId, cctvName, centerName) {
           var confirmation = confirm("현재 CCTV를 조회하시겠습니까?");
           if (confirmation) {
-            // var detectUrl = window.location.origin + '/detect?url=' + encodeURIComponent(url);
             var detectUrl = window.location.origin + '/detect?url=' + encodeURIComponent(url) + '&cctvId=' + cctvId + '&cctvName=' + cctvName + '&centerName=' + centerName;
             window.location.href = detectUrl;
           }

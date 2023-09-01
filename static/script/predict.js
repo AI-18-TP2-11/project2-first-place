@@ -354,11 +354,10 @@ async function sendPostRequest(bboxes, scores, labels, timestamp, width, height,
         'region_and_name': region_and_name,
         'cctv_name': cctvName,
         'center_name': centerName,
-        'img_name': img_name,
-        'img_directory': img_name
+        'img_name': img_name
     };
     // POST 요청을 보냅니다.
-    fetch('/test', {
+    fetch('/detect_post', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

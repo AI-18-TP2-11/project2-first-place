@@ -69,8 +69,8 @@ class Submission(db.Model):
     label = db.Column(db.String)
     img_name = db.Column(db.String)
 
-@app.route('/test', methods=['POST'])
-def test_post():
+@app.route('/detect_post', methods=['POST'])
+def detect_post():
     '''
     javascript에서 로그 받아오기\n
     현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_name']
