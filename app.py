@@ -21,18 +21,22 @@ def main():
 @app.route('/detect')
 def detect():
     cctv_url = request.args.get('url')
-    video_src, region_and_name = get_video_src(cctv_url)
+    cctv_id = request.args.get('cctvId')
+    cctv_name = request.args.get('cctvName')
+    center_name = request.args.get('centerName')
+    region_and_name = cctv_name
+    # video_src, region_and_name = get_video_src(cctv_url)
     # template = 'detect.html'
     # if video_src.endswith('m3u8'):
     #     template = 'detectM3u8.html'
     # else:
     #     template = 'detectMp4.html'
-    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ01ErVHVM1kI9JzFmFttstzi/WrzeAwnaNTYed4KnCSSd'
+    video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ055VkqvK2hm+T3A/l5Oyigsd6J7dr2Z2rf9zB1m4cli8'
     # video_src = r'http://210.179.218.52:1935/live/171.stream/playlist.m3u8'
     print(video_src)
     # return render_template(template, video_src=video_src, region_and_name='지역')
-    # return render_template('detect.html', video_src=video_src, region_and_name='지역')
-    return render_template('detect.html', video_src=video_src, region_and_name=region_and_name)
+    return render_template('detect.html', video_src=video_src, region_and_name='지역', cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
+    return render_template('detect.html', video_src=video_src, region_and_name=region_and_name, cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
 
 def parse_csv():
     data = []
@@ -72,7 +76,10 @@ def test_post():
     timestamp = data['timestamp'] # unix
     width = data['width'] # 이미지 width
     height = data['height'] # 이미지 height
-    region_and_name = data['region_and_name']
+    cctv_id = data['cctv_id'] # cctv id
+    region_and_name = data['region_and_name'] # cctv name
+    cctv_name = data['cctv_name'] # cctv name
+    center_name = data['center_name'] # center name
     img_directory = data['img_directory'] # 이미지 저장 경로
 
     print(data.values())
