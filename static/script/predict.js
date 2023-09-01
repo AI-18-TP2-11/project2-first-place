@@ -231,20 +231,22 @@ async function predict() {
             }
         }
         
-        let filePath = null;
+        // let filePath = null;
+        let fileName = null;
         // 재정렬한 labels length 0보다 크면, 즉 위반한 객체가 있으면
         if (filteredLabels.length > 0) {
             // 이미지 저장
-            const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
-            filePath = 'C:/cctv_images/' + fileName
+            // const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
+            // filePath = 'C:/cctv_images/' + fileName
+            fileName = region_and_name + '_' + currentTimestamp + '.jpg'
             // saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
             saveImage(imageData, filteredLogBboxes, filteredScores, filteredLabels, fileName); // 저장할 때 정상 객체도 제외
 
             // 로그 저장 bbox, score, label, timestamp, width, height, region, directory
-            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath) // 위반만 저장
+            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, fileName) // 위반만 저장
         }
-        // 로그 저장 bbox, score, label, timestamp, width, height, region, directory(이미지 없으면 none)
-        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, filePath) // 모두 저장
+        // 로그 저장 bbox, score, label, timestamp, width, height, region, img_name(이미지 없으면 none)
+        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, fileName) // 모두 저장
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
@@ -339,7 +341,7 @@ function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
 }
 
 // bbox, score, label, timestamp, imgsz, directory
-async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, region_and_name, img_directory) {
+async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, region_and_name, img_name) {
     // POST 요청을 보낼 데이터를 준비합니다.
     var data = {
         "bboxes": bboxes,
@@ -352,7 +354,8 @@ async function sendPostRequest(bboxes, scores, labels, timestamp, width, height,
         'region_and_name': region_and_name,
         'cctv_name': cctvName,
         'center_name': centerName,
-        'img_directory': img_directory
+        'img_name': img_name,
+        'img_directory': img_name
     };
     // POST 요청을 보냅니다.
     fetch('/test', {

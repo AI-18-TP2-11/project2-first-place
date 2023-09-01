@@ -53,7 +53,7 @@ def select():
 
 # DB 생성 형식
 class Submission(db.Model):
-    # cctv_id, cctv_name, center_name, timestamp, x1, x2, y1, y2, width, height, score, label, img_directory
+    # cctv_id, cctv_name, center_name, timestamp, x, y, bwidth, bheight, width, height, score, label, img_name
     id = db.Column(db.Integer, primary_key=True)
     cctv_id = db.Column(db.String)
     cctv_name = db.Column(db.String)
@@ -67,13 +67,13 @@ class Submission(db.Model):
     height = db.Column(db.Integer)
     score = db.Column(db.Float)
     label = db.Column(db.String)
-    img_directory = db.Column(db.String)
+    img_name = db.Column(db.String)
 
 @app.route('/test', methods=['POST'])
 def test_post():
     '''
     javascript에서 로그 받아오기\n
-    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_directory']
+    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_name']
     '''
     data = request.json
     bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
@@ -85,13 +85,13 @@ def test_post():
     cctv_id = data['cctv_id'] # cctv id
     cctv_name = data['cctv_name'] # cctv name
     center_name = data['center_name'] # center name
-    img_directory = data['img_directory'] # 이미지 저장 경로
+    img_name = data['img_name'] # 이미지 저장 경로
 
     print(data.values())
 
     # db로 데이터 전송
     zipped = zip(bboxes, scores, labels)
-    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_directory)
+    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name)
 
     return 'flask 및 db로 전송 성공', 200
 
@@ -99,8 +99,9 @@ def test_post():
 def upload_generated_data():
     '생성한 데이터 업로드'
     import pandas as pd
-    df = pd.read_csv('generated_data4.csv')
+    df = pd.read_csv('generated_data5.csv')
     add_all_generated(df.values.tolist())
+    return '생성 데이터 업로드 성공', 200
 
 def add_all_generated(bulk_data):
     data_to_insert = []
@@ -121,15 +122,14 @@ def add_all_generated(bulk_data):
                 height = datapoint[9],
                 score = datapoint[10],
                 label = datapoint[11],
-                img_directory = datapoint[12]
+                img_name = datapoint[12]
             )
         )
 
     db.session.add_all(data_to_insert)
     db.session.commit()
-    return '생성 데이터 업로드 성공', 200
 
-def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_directory):
+def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name):
     data_to_insert = [
         Submission(
             cctv_id = cctv_id,
@@ -144,7 +144,7 @@ def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, i
             height = height,
             score = score,
             label = label,
-            img_directory = img_directory
+            img_name = img_name
         )
         for bbox, score, label in zipped
     ]
