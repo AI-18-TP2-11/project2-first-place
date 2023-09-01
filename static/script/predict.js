@@ -284,11 +284,11 @@ async function saveImage(image, bboxes, scores, labels, fileName) {
     html2canvas(div).then(canvas => {
         if (navigator.msSaveBlob) {
         var blob = canvas.msToBlob(); 
-        return navigator.msSaveBlob(blob, fileName+'.jpg'); 
+        return navigator.msSaveBlob(blob, fileName); 
         } else { 
         var el = document.getElementById("target");
         el.href = canvas.toDataURL("image/jpeg");
-        el.download = fileName+'.jpg';
+        el.download = fileName;
         el.click();
         }
     });
@@ -344,7 +344,10 @@ async function sendPostRequest(bboxes, scores, labels, timestamp, width, height,
         'timestamp': timestamp,
         'width': width,
         'height': height,
+        'cctv_id': cctvId,
         'region_and_name': region_and_name,
+        'cctv_name': cctvName,
+        'center_name': centerName,
         'img_directory': img_directory
     };
     // POST 요청을 보냅니다.

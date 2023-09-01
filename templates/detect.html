@@ -14,7 +14,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/static/script/crop.js" type="module"></script>
 
-    <script>const region_and_name = '{{ region_and_name }}';</script>
+    <script>const cctvId = '{{ cctv_id }}';</script>
+    <script>const cctvName = '{{ cctv_name }}';</script>
+    <script>const region_and_name = '{{ cctv_name }}';</script>
+    <script>const centerName = '{{ center_name }}';</script>
     <script src="/static/script/predict.js" type="module"></script>
   </head>
 
@@ -23,7 +26,7 @@
     <div class="container">
       <div class="subcontainer top">
         <div class='left'>
-            <div class='bar'>{{ region_and_name }}  실시간 cctv 영상</div>
+            <div class='bar'>{{ cctv_name }} - {{ center_name }}  실시간 CCTV 영상</div>
             <div id="view" class="drawBlock">
               <!-- <img id="inputImage" width="640px" src="/static\images\C000002_003_0009_C_D_F_0.jpg"> -->
               <video id="inputVideo" controls width="640px" autoplay muted crossorigin="anonymous">

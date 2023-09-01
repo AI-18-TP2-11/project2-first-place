@@ -37,6 +37,7 @@
       csvData.forEach(function(row) {
           var xCoord = parseFloat(row.XCOORD);
           var yCoord = parseFloat(row.YCOORD);
+          var cctvId = row.CCTVID;
           var cctvName = row.CCTVNAME;
           var centerName = row.CENTERNAME;
           var url = row.URL;
@@ -47,7 +48,7 @@
               image: markerImage
           });
 
-          var content = `<div><strong>${cctvName}</strong><br>${centerName}<br><button onclick="showMessageBox('${url}')">CCTV 조회</button></div>`;
+          var content = `<div><strong>${cctvName}</strong><br>${centerName}<br><button onclick="showMessageBox('${url}', '${cctvId}', '${cctvName}', '${centerName}')">CCTV 조회</button></div>`;
 
 
           var infowindow = new kakao.maps.InfoWindow({
@@ -65,10 +66,11 @@
           marker.setMap(map);
       });
 
-      function showMessageBox(url) {
+      function showMessageBox(url, cctvId, cctvName, centerName) {
           var confirmation = confirm("현재 CCTV를 조회하시겠습니까?");
           if (confirmation) {
-            var detectUrl = window.location.origin + '/detect?url=' + encodeURIComponent(url);
+            // var detectUrl = window.location.origin + '/detect?url=' + encodeURIComponent(url);
+            var detectUrl = window.location.origin + '/detect?url=' + encodeURIComponent(url) + '&cctvId=' + cctvId + '&cctvName=' + cctvName + '&centerName=' + centerName;
             window.location.href = detectUrl;
           }
       }
