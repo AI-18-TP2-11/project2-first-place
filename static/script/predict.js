@@ -46,7 +46,7 @@ let canvasHolder; // 저장용 캔버스 담아두는 변수
 let yolov5 = null;
 async function loadModel() {
     try {
-        const yolov5 = await tf.loadGraphModel('/static/best_web_model/model.json');
+        const yolov5 = await tf.loadGraphModel('/static/TfjsYolov5Det/model.json');
 
         return yolov5;
     } catch (error) {
