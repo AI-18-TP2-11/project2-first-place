@@ -189,6 +189,7 @@ async function predict() {
     if (valid_detections_data > 0) {
         // bboxes_data는 1차원 배열. 4개의 요소를 가지는 valid_detection_data개의 배열로 재정렬
         const screen_bboxes = []; // 표기
+        const drawing_bboxes = []; // 화면 표기
         const log_bboxes = []; // 로그/저장
         for (let i = 0; i < valid_detections_data; i += 1) {
             let [x1, y1, x2, y2] = bboxes_data.slice(i * 4, (i + 1) * 4);
@@ -202,14 +203,23 @@ async function predict() {
             let sY2 = (y2*screenCropHiddenHeight) + screenCropTop;
             let sWidth = sX2 - sX1;
             let sHeight = sY2 - sY1;
-            let lX1 = (x1*realCropHiddenWidth) + realCropLeft;
-            let lX2 = (x2*realCropHiddenWidth) + realCropLeft;
-            let lY1 = (y1*realCropHiddenHeight) + realCropTop;
-            let lY2 = (y2*realCropHiddenHeight) + realCropTop;
+            let dX1 = (x1*realCropHiddenWidth) + realCropLeft;
+            let dX2 = (x2*realCropHiddenWidth) + realCropLeft;
+            let dY1 = (y1*realCropHiddenHeight) + realCropTop;
+            let dY2 = (y2*realCropHiddenHeight) + realCropTop;
+            let dWidth = dX2 - dX1;
+            let dHeight = dY2 - dY1;
+            let lX1 = sX1 / screenImageWidth;
+            let lX2 = sX2 / screenImageWidth;
+            let lY1 = sY1 / screenImageHeight;
+            let lY2 = sY2 / screenImageHeight;
             let lWidth = lX2 - lX1;
             let lHeight = lY2 - lY1;
+            let lXC = (lX1+lX2) / screenImageWidth;
+            let lYC = (lY1+lY2) / screenImageHeight
             screen_bboxes.push([sX1, sY1, sWidth, sHeight]);
-            log_bboxes.push([lX1, lY1, lWidth, lHeight]);
+            drawing_bboxes.push([dX1, dY1, dWidth, dHeight]);
+            log_bboxes.push([lXC, lYC, lWidth, lHeight]);
         }
 
         const scores = scores_data.slice(0,valid_detections_data);
@@ -220,12 +230,14 @@ async function predict() {
 
         // 위반사항 아닌 경우 로그 남기지 않기 위한 계산
         const filteredLogBboxes = [];
+        const filteredDrawingBboxes = [];
         const filteredScores = [];
         const filteredLabels = [];
         const filterCheck = [];
         for (let i = 0; i < labels.length; i++) {
             const label = labels[i];
             if (!goodLabels.includes(label)) {
+                filteredDrawingBboxes.push(drawing_bboxes[i]);
                 filteredLogBboxes.push(log_bboxes[i]);
                 filteredScores.push(scores[i]);
                 filteredLabels.push(label);
@@ -241,16 +253,17 @@ async function predict() {
         // 재정렬한 labels length 0보다 크면, 즉 위반한 객체가 있으면
         if (filteredLabels.length > 0) {
             // 이미지 저장
-            // const fileName = region_and_name + '_' + currentTimestamp + '.jpg'
+            // const fileName = cctvName + '_' + currentTimestamp + '.jpg'
             // filePath = 'C:/cctv_images/' + fileName
-            imgName = region_and_name + '_' + currentTimestamp + '.jpg'
-            // saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
-            saveImage(imageData, filteredLogBboxes, filteredScores, filteredLabels, imgName); // 저장할 때 정상 객체도 제외
+            imgName = cctvName + '_' + currentTimestamp + '.jpg'
+            // saveImage(imageData, drawing_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
+            saveImage(imageData, filteredDrawingBboxes, filteredScores, filteredLabels, imgName); // 저장할 때 정상 객체도 제외
 
             // 로그 저장 bbox, score, label, timestamp, width, height, directory
             // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, imgName) // 위반만 저장
         }
         const logItems = log(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck);
+        updateScreenLogs(logItems[0]);
 
         // 로그 저장 bbox, score, label, timestamp, width, height, img_name(이미지 없으면 none)
         sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck) // 모두 저장
@@ -347,6 +360,7 @@ function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
     return divTag;
 }
 
+// 로그 생성 함수
 function log(bboxes, scores, labels, timestamp, width, height, imgName, filterCheck) {
     const logItems = [];
     for (let i = 0; i < bboxes.length; i += 1) {
@@ -362,10 +376,25 @@ function log(bboxes, scores, labels, timestamp, width, height, imgName, filterCh
     return logItems;
 }
 
+// 화면에 로그 표기
+const displayExcludeArray = ['cctvId', 'bWidth', 'bHeight', 'iWidth', 'iHeight']
+const logKeys = ['cctvId', 'cctvName', 'centerName', "timestamp", "xCenter", "yCenter", "bWidth", "bHeight", "iWidth", "iHeight", "score", "label", 'imgName'];
+var deleteEmptyRow = 1;
 function updateScreenLogs(logItem) {
     const table = document.getElementById('logTable');
+    if (table.rows.length == 2 && deleteEmptyRow) {
+        table.deleteRow(-1);
+        deleteEmptyRow = 0;
+    }
     const row = table.insertRow();
+    var counter = 0;
     for (let i = 0; i < logItem.length; i += 1) {
+        if (displayExcludeArray.includes(logKeys[i])) {
+            continue;
+        }
+        let cell = row.insertCell(counter);
+        cell.innerText = logItem[i];
+        counter += 1;
     }
 }
 
