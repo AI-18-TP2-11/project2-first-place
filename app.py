@@ -73,7 +73,7 @@ class Submission(db.Model):
 def detect_post():
     '''
     javascript에서 로그 받아오기\n
-    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_name']
+    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_name', 'filterCheck]
     '''
     data = request.json
     bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
@@ -86,12 +86,13 @@ def detect_post():
     cctv_name = data['cctv_name'] # cctv name
     center_name = data['center_name'] # center name
     img_name = data['img_name'] # 이미지 저장 경로
+    filter_check = data['filterCheck'] # 위반사항 확인 list: 1이면 위반, 0이면 정상
 
     print(data.values())
 
     # db로 데이터 전송
     zipped = zip(bboxes, scores, labels)
-    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name)
+    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name, filter_check)
 
     return 'flask 및 db로 전송 성공', 200
 
@@ -129,7 +130,7 @@ def add_all_generated(bulk_data):
     db.session.add_all(data_to_insert)
     db.session.commit()
 
-def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name):
+def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name, filter_check):
     data_to_insert = [
         Submission(
             cctv_id = cctv_id,
@@ -144,9 +145,9 @@ def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, i
             height = height,
             score = score,
             label = label,
-            img_name = img_name
+            img_name = img_name if filter_check[idx] else None
         )
-        for bbox, score, label in zipped
+        for idx, (bbox, score, label) in enumerate(zipped)
     ]
 
     db.session.add_all(data_to_insert)

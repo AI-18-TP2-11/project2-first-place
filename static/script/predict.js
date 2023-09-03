@@ -222,12 +222,17 @@ async function predict() {
         const filteredLogBboxes = [];
         const filteredScores = [];
         const filteredLabels = [];
+        const filterCheck = [];
         for (let i = 0; i < labels.length; i++) {
             const label = labels[i];
             if (!goodLabels.includes(label)) {
                 filteredLogBboxes.push(log_bboxes[i]);
                 filteredScores.push(scores[i]);
                 filteredLabels.push(label);
+                filterCheck.push(1); // 위반
+            }
+            else {
+                filterCheck.push(0); // 위반 아님
             }
         }
         
@@ -242,11 +247,12 @@ async function predict() {
             // saveImage(imageData, log_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
             saveImage(imageData, filteredLogBboxes, filteredScores, filteredLabels, fileName); // 저장할 때 정상 객체도 제외
 
-            // 로그 저장 bbox, score, label, timestamp, width, height, region, directory
-            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, fileName) // 위반만 저장
+            // 로그 저장 bbox, score, label, timestamp, width, height, directory
+            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, fileName) // 위반만 저장
         }
-        // 로그 저장 bbox, score, label, timestamp, width, height, region, img_name(이미지 없으면 none)
-        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, region_and_name, fileName) // 모두 저장
+        logItems = log(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, fileName, filterCheck);
+        // 로그 저장 bbox, score, label, timestamp, width, height, img_name(이미지 없으면 none)
+        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, fileName, filterCheck) // 모두 저장
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
@@ -340,8 +346,22 @@ function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
     return divTag;
 }
 
-// bbox, score, label, timestamp, imgsz, directory
-async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, region_and_name, img_name) {
+function log(bboxes, scores, labels, timestamp, width, height, fileName, filterCheck) {
+    const logItems = [];
+    for (let i = 0; i < bboxes.length; i += 1) {
+        let [lBboxWidth, lBboxHeight] = bboxes[i].slice(2,4);
+        let lXCenter = bboxes[i][0] + lBboxWidth/2;
+        let lYCenter = bboxes[i][1] + lBboxHeight/2;
+        let lScore = scores[i];
+        let lLabel = labels[i];
+        let lFileName = filterCheck[i] ? fileName : null; // ternery
+        let datapoint = [cctvId, cctvName, centerName, timestamp, lXCenter, lYCenter, width, height, lImageWidth, lImageHeight, lScore, lLabel, lFileName];
+        logItems.push(datapoint);
+    }
+    return logItems;
+}
+
+async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, img_name, filterCheck) {
     // POST 요청을 보낼 데이터를 준비합니다.
     var data = {
         "bboxes": bboxes,
@@ -351,10 +371,10 @@ async function sendPostRequest(bboxes, scores, labels, timestamp, width, height,
         'width': width,
         'height': height,
         'cctv_id': cctvId,
-        'region_and_name': region_and_name,
         'cctv_name': cctvName,
         'center_name': centerName,
-        'img_name': img_name
+        'img_name': img_name,
+        'filter_check': filterCheck
     };
     // POST 요청을 보냅니다.
     fetch('/detect_post', {
