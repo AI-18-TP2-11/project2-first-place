@@ -262,8 +262,10 @@ async function predict() {
             // 로그 저장 bbox, score, label, timestamp, width, height, directory
             // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, imgName) // 위반만 저장
         }
-        const logItems = log(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck);
-        updateScreenLogs(logItems[0]);
+        const [dbLogItems, screenLogItems] = log(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck);
+        for (let i = 0; i < screenLogItems.length; i += 1) {
+            updateScreenLogs(screenLogItems[i]);
+        }
 
         // 로그 저장 bbox, score, label, timestamp, width, height, img_name(이미지 없으면 none)
         sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck) // 모두 저장
@@ -362,39 +364,68 @@ function drawBoundingBoxes(bboxes, scores, labels, pmsHolder, divTag) {
 
 // 로그 생성 함수
 function log(bboxes, scores, labels, timestamp, width, height, imgName, filterCheck) {
-    const logItems = [];
+    const dbLogItems = [];
+    const screenLogItems = [];
     for (let i = 0; i < bboxes.length; i += 1) {
         let [lBboxWidth, lBboxHeight] = bboxes[i].slice(2,4);
-        let lXCenter = bboxes[i][0] + lBboxWidth/2;
-        let lYCenter = bboxes[i][1] + lBboxHeight/2;
-        let lScore = scores[i];
+        let dbXCenter = bboxes[i][0] + lBboxWidth/2;
+        let dbYCenter = bboxes[i][1] + lBboxHeight/2;
+        let sXCenter = dbXCenter.toFixed(4);
+        let sYCenter = dbYCenter.toFixed(4);
+
+        let dbScore = scores[i];
         let lLabel = labels[i];
+        let sScore = dbScore.toFixed(4);
+
         let lImgName = filterCheck[i] ? imgName : null; // ternery
-        let datapoint = [cctvId, cctvName, centerName, timestamp, lXCenter, lYCenter, lBboxWidth, lBboxHeight, width, height, lScore, lLabel, lImgName];
-        logItems.push(datapoint);
+
+        let date = new Date(timestamp);
+        let year = date.getFullYear();
+        let month = String(date.getMonth() + 1).padStart(2,0);
+        let day = String(date.getDate()).padStart(2,0);
+        let hours = String(date.getHours()).padStart(2,0);
+        let minutes = String(date.getMinutes()).padStart(2,0);
+        let seconds = String(date.getSeconds()).padStart(2,0);
+        let subseconds = String(Math.round((timestamp%1000)/10)).padStart(2,0);
+        let dateString = `${year}-${month}-${day}`
+        let timeString = `${hours}:${minutes}:${seconds}:${subseconds}`
+
+        let dbDatapoint = {
+            'cctvId': cctvId, 
+            'cctvName': cctvName, 
+            'centerName': centerName, 
+            'timestamp': timestamp, 
+            'xCenter': dbXCenter, 
+            'yCenter': dbYCenter, 
+            'bWidth': lBboxWidth, 
+            'bHeight': lBboxHeight, 
+            'iWidth': width, 
+            'iHeight': height, 
+            'score': dbScore, 
+            'label': lLabel, 
+            'imgName': lImgName
+        };
+        let screenDatapoint = [dateString, timeString, sXCenter, sYCenter, sScore, lLabel, lImgName];
+        dbLogItems.push(dbDatapoint);
+        screenLogItems.push(screenDatapoint)
     }
-    return logItems;
+    return [dbLogItems, screenLogItems];
 }
 
 // 화면에 로그 표기
-const displayExcludeArray = ['cctvId', 'bWidth', 'bHeight', 'iWidth', 'iHeight']
+const displayExcludeArray = ['cctvId', 'cctvName', 'centerName', 'bWidth', 'bHeight', 'iWidth', 'iHeight']
 const logKeys = ['cctvId', 'cctvName', 'centerName', "timestamp", "xCenter", "yCenter", "bWidth", "bHeight", "iWidth", "iHeight", "score", "label", 'imgName'];
 var deleteEmptyRow = 1;
-function updateScreenLogs(logItem) {
+function updateScreenLogs(screenLogItem) {
     const table = document.getElementById('logTable');
     if (table.rows.length == 2 && deleteEmptyRow) {
         table.deleteRow(-1);
         deleteEmptyRow = 0;
     }
     const row = table.insertRow();
-    var counter = 0;
-    for (let i = 0; i < logItem.length; i += 1) {
-        if (displayExcludeArray.includes(logKeys[i])) {
-            continue;
-        }
-        let cell = row.insertCell(counter);
-        cell.innerText = logItem[i];
-        counter += 1;
+    for (let i = 0; i < screenLogItem.length; i += 1) {
+        let cell = row.insertCell(i);
+        cell.innerText = screenLogItem[i];
     }
 }
 
