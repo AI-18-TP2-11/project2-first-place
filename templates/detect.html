@@ -24,48 +24,48 @@
     <a id="target" style="display: none"></a> <!--이미지 저장하기 위해 canvas 그리는 용도. 화면에 표기 안 됨-->
     <div class="container">
       <div class="subcontainer top">
-        <div class='left'>
-            <div class='bar'>{{ cctv_name }} - {{ center_name }}  실시간 CCTV 영상</div>
-            <div id="view" class="drawBlock">
-              <!-- <img id="inputImage" width="640px" src="/static\images\C000002_003_0009_C_D_F_0.jpg"> -->
-              <video id="inputVideo" controls width="640px" autoplay muted crossorigin="anonymous">
-                <source src="{{ video_src }}">
-              </video>
-              <div class="cropBox resize-drag" id="screenCropBox" style="left: 0px; top: 0px; width: 640px; height: 360px;"></div>
-            </div>
-            <script>
-              const isM3u8 = '{{ video_src }}'.endsWith('m3u8');
-              console.log('{{video_src}}')
-              console.log(isM3u8)
-              function setM3u8Attributes(){
-                const tagToRefresh = document.getElementById('inputVideo');
-                const source = tagToRefresh.getElementsByTagName('source');
-                // source.setAttribute('src', 'fffff')
-                tagToRefresh.setAttribute('data-setup', '{}');
-                tagToRefresh.setAttribute('class', 'video-js');
-              }
+        <div class='left', id="left">
+          <div class='bar'>{{ cctv_name }} - {{ center_name }}  실시간 CCTV 영상</div>
+          <div id="view" class="drawBlock">
+            <!-- <img id="inputImage" width="640px" src="/static\images\C000002_003_0009_C_D_F_0.jpg"> -->
+            <video id="inputVideo" controls width="640px" autoplay muted crossorigin="anonymous">
+              <source src="{{ video_src }}">
+            </video>
+            <div class="cropBox resize-drag" id="screenCropBox" style="left: 0px; top: 0px; width: 640px; height: 360px;"></div>
+          </div>
+          <script>
+            const isM3u8 = '{{ video_src }}'.endsWith('m3u8');
+            console.log('{{video_src}}')
+            console.log(isM3u8)
+            function setM3u8Attributes(){
+              const tagToRefresh = document.getElementById('inputVideo');
+              const source = tagToRefresh.getElementsByTagName('source');
+              // source.setAttribute('src', 'fffff')
+              tagToRefresh.setAttribute('data-setup', '{}');
+              tagToRefresh.setAttribute('class', 'video-js');
+            }
 
-              if (isM3u8) {
-                setM3u8Attributes();
-              }
-              else {
-                setInterval(reloadMp4, 31000) // mp4 31초마다 다시 재생
-              }
+            if (isM3u8) {
+              setM3u8Attributes();
+            }
+            else {
+              setInterval(reloadMp4, 31000) // mp4 31초마다 다시 재생
+            }
 
-              function reloadMp4() {
-                console.log('비디오 reload')
-                const parent = document.getElementById('view');
-                const tagToRefresh = document.getElementById('inputVideo');
-                const source = document.createElement('source');
-                const video = document.querySelector('video')
-                video.pause();
-                video.load();
-                video.play();
-              }
-            </script>
+            function reloadMp4() {
+              console.log('비디오 reload')
+              const parent = document.getElementById('view');
+              const tagToRefresh = document.getElementById('inputVideo');
+              const source = document.createElement('source');
+              const video = document.querySelector('video')
+              video.pause();
+              video.load();
+              video.play();
+            }
+          </script>
         </div>
 
-        <div class='right'>
+        <div class='right', id="right">
 
           <div class='bar'>로그</div>
           

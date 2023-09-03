@@ -258,17 +258,16 @@ async function predict() {
             imgName = cctvName + '_' + currentTimestamp + '.jpg'
             // saveImage(imageData, drawing_bboxes, scores, labels, fileName); // 저장할 때는 정상 객체도 표기
             saveImage(imageData, filteredDrawingBboxes, filteredScores, filteredLabels, imgName); // 저장할 때 정상 객체도 제외
-
-            // 로그 저장 bbox, score, label, timestamp, width, height, directory
-            // sendPostRequest(filteredLogBboxes, filteredScores, filteredLabels, currentTimestamp, originalImageWidth, originalImageHeight, imgName) // 위반만 저장
         }
+        // 저장/표기할 로그 생성
         const [dbLogItems, screenLogItems] = log(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck);
         for (let i = 0; i < screenLogItems.length; i += 1) {
+            // 로그 표기
             updateScreenLogs(screenLogItems[i]);
         }
 
-        // 로그 저장 bbox, score, label, timestamp, width, height, img_name(이미지 없으면 none)
-        sendPostRequest(log_bboxes, scores, labels, currentTimestamp, originalImageWidth, originalImageHeight, imgName, filterCheck) // 모두 저장
+        // 로그 저장
+        sendPostRequest(dbLogItems)
 
     }
     tf.engine().endScope(); // scope 사이 생성된 tensor 메모리에서 삭제
@@ -429,28 +428,14 @@ function updateScreenLogs(screenLogItem) {
     }
 }
 
-async function sendPostRequest(bboxes, scores, labels, timestamp, width, height, imgName, filterCheck) {
-    // POST 요청을 보낼 데이터를 준비합니다.
-    var data = {
-        "bboxes": bboxes,
-        "scores": scores,
-        "labels": labels,
-        'timestamp': timestamp,
-        'width': width,
-        'height': height,
-        'cctvId': cctvId,
-        'cctvName': cctvName,
-        'centerName': centerName,
-        'imgName': imgName,
-        'filterCheck': filterCheck
-    };
+async function sendPostRequest(dbLogItems) {
     // POST 요청을 보냅니다.
     fetch('/detect_post', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(dbLogItems)
         })
         .then(response => response.text())
         .then(result => console.log(result))

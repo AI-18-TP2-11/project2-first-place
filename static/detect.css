@@ -10,6 +10,7 @@
 
   .left {
     width: 46%;
+    height: 450px;
     float: left;
     box-sizing: content-box;
     border: 5px solid #6E6E6E;
@@ -19,11 +20,13 @@
   
   .right {
     width: 46%;
+    height: 450px;
     float: right;
     box-sizing: content-box;
     border: 5px solid #6E6E6E;
     text-align: center;
     padding: 15px;
+    overflow: auto;
   }
 
   .bottom {

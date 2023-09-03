@@ -55,44 +55,29 @@ def select():
 class Submission(db.Model):
     # cctv_id, cctv_name, center_name, timestamp, x, y, bwidth, bheight, width, height, score, label, img_name
     id = db.Column(db.Integer, primary_key=True)
-    cctv_id = db.Column(db.String)
-    cctv_name = db.Column(db.String)
-    center_name = db.Column(db.String)
+    cctvId = db.Column(db.String)
+    cctvName = db.Column(db.String)
+    centerName = db.Column(db.String)
     timestamp = db.Column(db.Integer)
-    x = db.Column(db.Float)
-    y = db.Column(db.Float)
-    bwidth = db.Column(db.Float)
-    bheight = db.Column(db.Float)
-    width = db.Column(db.Integer)
-    height = db.Column(db.Integer)
+    xCenter = db.Column(db.Float)
+    yCenter = db.Column(db.Float)
+    bWidth = db.Column(db.Float)
+    bHeight = db.Column(db.Float)
+    iWidth = db.Column(db.Integer)
+    iHeight = db.Column(db.Integer)
     score = db.Column(db.Float)
     label = db.Column(db.String)
-    img_name = db.Column(db.String)
+    imgName = db.Column(db.String)
 
 @app.route('/detect_post', methods=['POST'])
 def detect_post():
     '''
     javascript에서 로그 받아오기\n
-    현재 data.keys() == ['bboxes', 'scores', 'labels', 'timestamp', 'width', 'height', region_and_name', 'img_name', 'filterCheck]
+    현재 dictionary로 구성된 list. dictionary keys == ['cctvId', 'cctvName', 'centerName', 'timestamp', 'xCenter', 'yCenter', 'bWidth', 'bHeight', 'iWidth', 'iHeight', 'score', 'label', 'imgName']
     '''
     data = request.json
-    bboxes = data['bboxes'] # nested array: [[x, y, w, h],...]
-    scores = data['scores'] # [0.6, 0.89,...]
-    labels = data['labels'] # [0, 4,...] # yolo 라벨 0-23
-    timestamp = data['timestamp'] # unix
-    width = data['width'] # 이미지 width
-    height = data['height'] # 이미지 height
-    cctv_id = data['cctvId'] # cctv id
-    cctv_name = data['cctvName'] # cctv name
-    center_name = data['centerName'] # center name
-    img_name = data['imgName'] # 이미지 저장 경로
-    filter_check = data['filterCheck'] # 위반사항 확인 list: 1이면 위반, 0이면 정상
-
-    print(data.values())
-
-    # db로 데이터 전송
-    zipped = zip(bboxes, scores, labels)
-    add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name, filter_check)
+    # 데이터 전송
+    add_all(data)
 
     return 'flask 및 db로 전송 성공', 200
 
@@ -100,7 +85,7 @@ def detect_post():
 def upload_generated_data():
     '생성한 데이터 업로드'
     import pandas as pd
-    df = pd.read_csv('generated_data5.csv')
+    df = pd.read_csv('generated_data6.csv')
     add_all_generated(df.values.tolist())
     return '생성 데이터 업로드 성공', 200
 
@@ -111,44 +96,28 @@ def add_all_generated(bulk_data):
         print(len(datapoint))
         data_to_insert.append(
             Submission(
-                cctv_id = datapoint[0],
-                cctv_name = datapoint[1],
-                center_name = datapoint[2],
+                cctvId = datapoint[0],
+                cctvName = datapoint[1],
+                centerName = datapoint[2],
                 timestamp = datapoint[3],
-                x = datapoint[4],
-                y = datapoint[5],
-                bwidth = datapoint[6],
-                bheight = datapoint[7],
-                width = datapoint[8],
-                height = datapoint[9],
+                xCenter = datapoint[4],
+                yCenter = datapoint[5],
+                bWidth = datapoint[6],
+                bHeight = datapoint[7],
+                iWidth = datapoint[8],
+                iHeight = datapoint[9],
                 score = datapoint[10],
                 label = datapoint[11],
-                img_name = datapoint[12]
+                imgName = datapoint[12]
             )
         )
 
     db.session.add_all(data_to_insert)
     db.session.commit()
 
-def add_all(cctv_id, cctv_name, center_name, timestamp, zipped, width, height, img_name, filter_check):
-    data_to_insert = [
-        Submission(
-            cctv_id = cctv_id,
-            cctv_name = cctv_name,
-            center_name = center_name,
-            timestamp = timestamp,
-            x = bbox[0],
-            y = bbox[1],
-            bwidth = bbox[2],
-            bheight = bbox[3],
-            width = width,
-            height = height,
-            score = score,
-            label = label,
-            img_name = img_name if filter_check[idx] else None
-        )
-        for idx, (bbox, score, label) in enumerate(zipped)
-    ]
+def add_all(data):
+    # 데이터 전송
+    data_to_insert = [Submission(**datapoint) for datapoint in data]
 
     db.session.add_all(data_to_insert)
     db.session.commit()
