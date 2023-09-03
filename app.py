@@ -82,10 +82,10 @@ def detect_post():
     timestamp = data['timestamp'] # unix
     width = data['width'] # 이미지 width
     height = data['height'] # 이미지 height
-    cctv_id = data['cctv_id'] # cctv id
-    cctv_name = data['cctv_name'] # cctv name
-    center_name = data['center_name'] # center name
-    img_name = data['img_name'] # 이미지 저장 경로
+    cctv_id = data['cctvId'] # cctv id
+    cctv_name = data['cctvName'] # cctv name
+    center_name = data['centerName'] # center name
+    img_name = data['imgName'] # 이미지 저장 경로
     filter_check = data['filterCheck'] # 위반사항 확인 list: 1이면 위반, 0이면 정상
 
     print(data.values())
