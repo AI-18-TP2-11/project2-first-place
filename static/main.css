@@ -1,5 +1,8 @@
 
-
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
 
     .bar1 {
         float: left;
@@ -10,27 +13,57 @@
         text-align: center;
         color:#FFFFFF;
         line-height: 200%;
-        }
-    
-    .bar2 {
+    }
+
+    .subcontainer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 80%;
+    }
+
+    .left {
+        width: 46%;
+        height: 450px;
         float: left;
-        width:100%;
-        height:100px;
-        background-color:#dddddd;}
+        box-sizing: content-box;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .right {
+        width: 46%;
+        height: 450px;
+        float: right;
+        box-sizing: content-box;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 15px;
+        overflow: auto;
+    }
     
-    .input-box-main{
-        width: 960px;
-        height:30px;
+    .menu{
+        width: 70%;
+        height: 50%;
         background-color: #FFFFFF;
-        padding:15px;
         border: 5px solid #6E6E6E;
         border-radius: 10px;
         box-sizing: content-box;
-        margin: 10px auto;
-        font-size: 1.2em;
+        font-size: 50px;
         text-align: center;
         color: #6E6E6E;
-        margin: 10px auto;
+        margin: auto;
         background-repeat: no-repeat;
         background-position: left center, right center;
-        }
+    
+        display: flex; /* 텍스트를 세로, 가로 중앙 정렬하기 위해 추가 */
+        flex-direction: column; /* 텍스트를 세로로 정렬하기 위해 추가 */
+        justify-content: center; /* 텍스트를 세로 중앙 정렬하기 위해 추가 */
+        align-items: center; /* 텍스트를 가로 중앙 정렬하기 위해 추가 */
+        cursor: pointer;
+    }

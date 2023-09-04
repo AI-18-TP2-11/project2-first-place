@@ -24,14 +24,14 @@ def detect():
     cctv_id = request.args.get('cctvId')
     cctv_name = request.args.get('cctvName')
     center_name = request.args.get('centerName')
-    region_and_name = cctv_name
-    # video_src, region_and_name = get_video_src(cctv_url)
+    # region_and_name = cctv_name
+    video_src, region_and_name = get_video_src(cctv_url)
     # template = 'detect.html'
     # if video_src.endswith('m3u8'):
     #     template = 'detectM3u8.html'
     # else:
     #     template = 'detectMp4.html'
-    video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ03fYeEhW92WP7ECMiADF2dbnoVF8QLTyLfUdaRwFycRF'
+    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ03fYeEhW92WP7ECMiADF2dbnoVF8QLTyLfUdaRwFycRF'
     # video_src = r'http://210.179.218.52:1935/live/171.stream/playlist.m3u8'
     print(video_src)
     # return render_template(template, video_src=video_src, region_and_name='지역')
