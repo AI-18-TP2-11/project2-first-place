@@ -24,19 +24,19 @@ def detect():
     cctv_id = request.args.get('cctvId')
     cctv_name = request.args.get('cctvName')
     center_name = request.args.get('centerName')
-    # region_and_name = cctv_name
-    video_src, region_and_name = get_video_src(cctv_url)
+    video_src = get_video_src(cctv_url)
     # template = 'detect.html'
     # if video_src.endswith('m3u8'):
     #     template = 'detectM3u8.html'
     # else:
     #     template = 'detectMp4.html'
-    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ03fYeEhW92WP7ECMiADF2dbnoVF8QLTyLfUdaRwFycRF'
+    # http://www.utic.go.kr/view/map/cctvStream.jsp?cctvid=L902704&cctvname=%25EC%2584%259C%25EC%259A%25B8%2520%25EC%2584%259C%25EC%25B4%2588%2520%25EC%2584%259C%25EC%25B4%2588%25EB%258C%2580%25EB%25A1%259C&kind=EE&cctvip=9990&cctvch=null&id=null&cctvpasswd=null&cctvport=null&minX=127.00182995981353&minY=37.48782667683961&maxX=127.06121163497251&maxY=37.51313060242616
+    # video_src = r'//cctvsec.ktict.co.kr/9990/0pqKTO1uXKtGWU21VubJ07na3rnqRars7ib9vSEaDAIK+hrf6T+fs2Nh4irB+FG0'
     # video_src = r'http://210.179.218.52:1935/live/171.stream/playlist.m3u8'
     print(video_src)
     # return render_template(template, video_src=video_src, region_and_name='지역')
-    return render_template('detect.html', video_src=video_src, region_and_name='지역', cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
-    return render_template('detect.html', video_src=video_src, region_and_name=region_and_name, cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
+    return render_template('detect.html', video_src=video_src, cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
+    return render_template('detect.html', video_src=video_src, cctv_id=cctv_id, cctv_name=cctv_name, center_name=center_name)
 
 def parse_csv():
     data = []

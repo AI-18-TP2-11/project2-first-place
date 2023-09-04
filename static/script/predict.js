@@ -44,6 +44,7 @@ let canvasHolder; // 저장용 캔버스 담아두는 변수
 
 // yolov5 모델 함수
 let yolov5 = null;
+const square = false;
 async function loadModel() {
     try {
         const yolov5 = await tf.loadGraphModel('/static/TfjsYolov5Det/model.json');
@@ -104,9 +105,9 @@ async function predict() {
     const input = tf.browser.fromPixels(imageData).div(255.0);
     let rescaledInput;
     
-    // 사이즈 조정 단계. 모델이 640x360에서 aspectRatio == 16/9로 640x640로 늘어난 이미지를 학습했기 때문에 전처리 필요.
+    // 사이즈 조정 단계.
     // 0. cropBox에 따라 잘라주기
-    // 1. 16:9 비율로 현 이미지 세로 늘려줌
+    // 1. 정사각형 학습 모델은 16:9 비율로 현 이미지 세로 늘려줌.
     // 2. padding으로 정사각형으로 만듦
     // 3. 640x640로 resize
 
@@ -138,8 +139,14 @@ async function predict() {
     rescaledInput = tf.slice(input, cropStartPoint, cropSize);
 
     // 1. 비율 늘려주기
-    const intermediateHeight = Math.round(realCropHeight * aspectRatio);
-    rescaledInput = tf.image.resizeBilinear(rescaledInput, [intermediateHeight, realCropWidth], true);
+    let intermediateHeight;
+    if (square) {
+        intermediateHeight = Math.round(realCropHeight * aspectRatio);
+        rescaledInput = tf.image.resizeBilinear(rescaledInput, [intermediateHeight, realCropWidth], true);
+    }
+    else {
+        intermediateHeight = realCropHeight;
+    }
 
     // 2. padding
     let padAmount;

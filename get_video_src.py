@@ -22,10 +22,7 @@ def get_video_src(iframe_url=r'http://www.utic.go.kr/view/map/cctvStream.jsp?cct
     video = wait.until(EC.presence_of_element_located((By.TAG_NAME, 'source')))
     video_src = video.get_attribute('src')
 
-    p_hd_tag = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'p.hd')))
-    region_and_name = p_hd_tag.text
-
-    return video_src, region_and_name
+    return video_src
 
 if __name__ == '__main__':
     get_video_src()
