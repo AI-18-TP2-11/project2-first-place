@@ -60,7 +60,7 @@ loadModel().then(model => {
     yolov5 = model;
     // 3초 기다렸다가 실행. videoWidth, videoHeight가 0이 아닌 경우 .then하는 것 나중에 적용해보기
     setTimeout(function() {
-        setInterval(predict, 2000);
+        setInterval(predict, 100);
     }, 500);
 })
 
